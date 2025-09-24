@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -12,6 +14,47 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<UserEntity> {
     const user = this.userRepository.create(dto);
+    return await this.userRepository.save(user);
+  }
+
+  async findByEmail(email: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { correo_electronico: email },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con email ${email} no encontrado`);
+    }
+
+    return user;
+  }
+
+  async findOne(id: number): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    return user;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    const user = await this.findOne(id);
+
+    // Check if email is being updated and if it's already taken
+    if (updateUserDto.correo_electronico && updateUserDto.correo_electronico !== user.correo_electronico) {
+      const existingUser = await this.userRepository.findOne({
+        where: { correo_electronico: updateUserDto.correo_electronico },
+      });
+
+      if (existingUser) {
+        throw new ConflictException(`El email ${updateUserDto.correo_electronico} ya está en uso`);
+      }
+    }
+
+    // Update the user
+    Object.assign(user, updateUserDto);
     return await this.userRepository.save(user);
   }
 }
