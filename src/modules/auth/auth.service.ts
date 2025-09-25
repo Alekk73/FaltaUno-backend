@@ -1,24 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
+import { UserEntity } from '../users/entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(private userService: UsersService) {}
 
-  // Función Promise<{ message: string}>
-  async register(dto: RegisterDto) {
-    // 1. Verificar si ya existe un usuario con el correo ingresado
-    //    -> Usar userService.findByEmail(dto.correo_electronico)
-    //    -> Si existe, lanzar BadRequestException('El correo ya esta registrado')
-    //
-    // 2. Si no existe, hashea la contraseña recibida en dto.contrasena
-    //    -> Usar bcrypt.hash(dto.contrasena, HASH_SALT)
-    //
-    // 3. Llamar a userService.create() para crear y guardar el nuevo usuario
-    //    -> Pasar dto con la contraseña ya hasheada
-    //
-    // 4. Retornar mensaje
-    //    -> { message: 'Usuario creado correctamente' }
+  async register(dto: RegisterDto): Promise<{ message: string }> {
+    let existUser: UserEntity | null = null;
+
+    try {
+      existUser = await this.userService.findByEmail(dto.correo_electronico);
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+    }
+
+    if (existUser) {
+      throw new BadRequestException(
+        'Correo electrónico ingresado ya existente',
+      );
+    }
+
+    const hashPassword = await bcrypt.hash(
+      dto.contrasena,
+      Number(process.env.HASH_SALT),
+    );
+
+    const user = await this.userService.create({
+      ...dto,
+      contrasena_hash: hashPassword,
+    });
+
+    if (!user) {
+      throw new BadRequestException('Error al crear el usuario');
+    }
+
+    return { message: 'Usuario creado correctamente' };
   }
 }
