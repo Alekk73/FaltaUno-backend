@@ -43,7 +43,7 @@ Directory structure:
 
 1. **Clonar el repositorio**
    ```
-   git clone [<url-del-repositorio>](https://github.com/Alekk73/FaltaUno-backend.git)
+   git clone https://github.com/Alekk73/FaltaUno-backend.git
    ```
 2. **Instalar dependencias**
    ```
