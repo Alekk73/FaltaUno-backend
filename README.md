@@ -18,7 +18,7 @@ Este servicio gestiona la lógica principal de usuarios, autenticación y equipo
 
 ```
 Directory structure: 
-└── alekk73-faltauno-backend/
+└── faltauno-backend/
   ├── src/
   │ ├── app.module.ts # Módulo raíz de la aplicación
   │ ├── main.ts # Punto de entrada
