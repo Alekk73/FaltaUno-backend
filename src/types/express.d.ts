@@ -4,3 +4,14 @@ declare namespace NodeJS {
     JWT_SECRET: string;
   }
 }
+
+namespace Express {
+  interface Request {
+    user: {
+      id: number;
+      correo_electronico: string;
+      rol: RolesUser;
+      equipoId: number | null;
+    };
+  }
+}

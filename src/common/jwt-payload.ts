@@ -2,7 +2,7 @@ import { RolesUser } from './enums/roles-user.enum';
 
 export interface JwtPayload {
   id: number;
-  email: string;
+  correo_electronico: string;
   rol: RolesUser;
   // teamId: number | null;
 }
