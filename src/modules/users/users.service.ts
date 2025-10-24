@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -20,6 +24,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: { correo_electronico: email },
+      relations: ['equipo'],
     });
 
     if (!user) {
@@ -43,13 +48,18 @@ export class UsersService {
     const user = await this.findOne(id);
 
     // Check if email is being updated and if it's already taken
-    if (updateUserDto.correo_electronico && updateUserDto.correo_electronico !== user.correo_electronico) {
+    if (
+      updateUserDto.correo_electronico &&
+      updateUserDto.correo_electronico !== user.correo_electronico
+    ) {
       const existingUser = await this.userRepository.findOne({
         where: { correo_electronico: updateUserDto.correo_electronico },
       });
 
       if (existingUser) {
-        throw new ConflictException(`El email ${updateUserDto.correo_electronico} ya está en uso`);
+        throw new ConflictException(
+          `El email ${updateUserDto.correo_electronico} ya está en uso`,
+        );
       }
     }
 

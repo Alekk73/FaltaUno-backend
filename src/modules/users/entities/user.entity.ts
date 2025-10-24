@@ -1,8 +1,9 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { IUser } from '../user.interface';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
+import { TeamEntity } from 'src/modules/teams/entities/team.entity';
 
 @Entity({ name: 'usuarios' })
 export class UserEntity extends BaseEntity implements IUser {
@@ -22,6 +23,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: RolesUser, default: RolesUser.usuario })
   rol: RolesUser;
 
-  @Column({ type: 'int', nullable: true })
-  equipo_id: number;
+  @ManyToOne(() => TeamEntity, (team) => team.usuarios)
+  @JoinColumn({ name: 'equipo_id' })
+  equipo: TeamEntity | null;
 }
