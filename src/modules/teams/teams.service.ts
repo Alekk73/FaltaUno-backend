@@ -1,10 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TeamEntity } from './entities/team.entity';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { UserEntity } from 'src/modules/users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { JwtPayload } from 'src/common/jwt-payload';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Injectable()
 export class TeamsService {
@@ -12,49 +19,53 @@ export class TeamsService {
     @InjectRepository(TeamEntity)
     private readonly teamRepository: Repository<TeamEntity>,
 
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly usersService: UsersService,
   ) {}
 
   // Crear un equipo
-  async create(dto: CreateTeamDto, userId: number): Promise<TeamEntity> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException('Usuario creador no encontrado');
-
-    // Se crea el equipo con el usuario como creador
-    const nuevoEquipo = this.teamRepository.create({
-      nombre: dto.nombre,
-      owner: user,
-      usuarios: [user],
-    });
-
-    await this.teamRepository.save(nuevoEquipo);
-
-    // Se retorna el equipo con relaciones cargadas
-    const equipoConRelaciones = await this.teamRepository.findOne({
-      where: { id: nuevoEquipo.id },
-      relations: ['creador', 'usuarios'],
-    });
-
-    if (!equipoConRelaciones) {
-      throw new NotFoundException('Error al crear el equipo');
+  async create(userData: JwtPayload, dto: CreateTeamDto): Promise<TeamEntity> {
+    if (userData.equipoId !== null) {
+      throw new BadRequestException('Ya tiene un equipo.');
     }
 
-    return equipoConRelaciones;
+    const nameInUse = await this.teamRepository.findOne({
+      where: { nombre: dto.nombre },
+    });
+
+    if (nameInUse) {
+      throw new BadRequestException('Nombre ingresado ya en uso');
+    }
+
+    // Se crea el equipo con el usuario como creador
+    const newTeam = this.teamRepository.create({
+      nombre: dto.nombre,
+      creador: { id: userData.id },
+      usuarios: [{ id: userData.id }],
+    });
+    await this.teamRepository.save(newTeam);
+
+    await this.usersService.update(userData.id, {
+      rol: RolesUser.capitan,
+    });
+
+    // Se retorna el equipo con relaciones cargadas
+    return await this.findById(newTeam.id);
   }
 
   // Mostrar todos los equipos
   async findAll(): Promise<TeamEntity[]> {
     return await this.teamRepository.find({
       relations: ['creador', 'usuarios'],
+      select: this.responseQuery,
     });
   }
 
   // Mostrar un equipo por ID
-  async findOne(id: number): Promise<TeamEntity> {
+  async findById(id: number): Promise<TeamEntity> {
     const team = await this.teamRepository.findOne({
       where: { id },
       relations: ['creador', 'usuarios'],
+      select: this.responseQuery,
     });
 
     if (!team) throw new NotFoundException('Equipo no encontrado');
@@ -62,26 +73,66 @@ export class TeamsService {
   }
 
   // Actualiza un equipo
-  async update(id: number, dto: UpdateTeamDto): Promise<TeamEntity> {
-    const team = await this.findOne(id);
+  async update(userData: JwtPayload, dto: UpdateTeamDto): Promise<TeamEntity> {
+    if (userData.rol !== RolesUser.capitan) {
+      throw new BadRequestException('No eres el capitan del equipo');
+    }
+
+    const newNameTeamInUse = await this.teamRepository.findOne({
+      where: { nombre: dto.nombre },
+    });
+
+    if (newNameTeamInUse) {
+      throw new BadRequestException('Nombre ingresado ya existente');
+    }
+
+    const team = await this.findById(Number(userData.equipoId));
     Object.assign(team, dto);
-    return await this.teamRepository.save(team);
+
+    await this.teamRepository.save(team);
+
+    return await this.findById(team.id);
   }
 
   // Elimina un equipo
-  async remove(id: number): Promise<void> {
-    const team = await this.findOne(id);
+  async remove(userData: JwtPayload): Promise<void> {
+    if (userData.equipoId === null) {
+      throw new BadRequestException('No existe equipo a eliminar');
+    }
+
+    const team = await this.findById(userData.equipoId);
+
+    if (!team) {
+      throw new NotFoundException('Equipo no encontrado');
+    }
+
+    if (team.creador.id !== userData.id) {
+      throw new ForbiddenException('Solo el capitán puede eliminar el equipo');
+    }
+
+    for (const user of team.usuarios) {
+      await this.usersService.update(user.id, {
+        rol: RolesUser.usuario,
+      });
+    }
+
     await this.teamRepository.remove(team);
   }
 
-  // Agrega un usuario 
-  async addMember(teamId: number, userId: number): Promise<TeamEntity> {
-    const team = await this.findOne(teamId);
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) throw new NotFoundException('Usuario no encontrado');
-
-    team.usuarios.push(user);
-    return await this.teamRepository.save(team);
-  }
+  private responseQuery = {
+    id: true,
+    nombre: true,
+    creadoEn: true,
+    usuarios: {
+      id: true,
+      nombre: true,
+      apellido: true,
+      rol: true,
+    },
+    creador: {
+      id: true,
+      nombre: true,
+      apellido: true,
+    },
+  };
 }
