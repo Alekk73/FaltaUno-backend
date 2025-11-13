@@ -23,7 +23,10 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'enum', enum: RolesUser, default: RolesUser.usuario })
   rol: RolesUser;
 
-  @ManyToOne(() => TeamEntity, (team) => team.usuarios)
+  @ManyToOne(() => TeamEntity, (team) => team.usuarios, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   @JoinColumn({ name: 'equipo_id' })
   equipo: TeamEntity | null;
 }
