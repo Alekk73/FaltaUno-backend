@@ -15,6 +15,6 @@ export class TeamEntity extends BaseEntity {
   @JoinColumn({ name: 'creador_id' })
   creador: UserEntity;
 
-  @OneToMany(() => InvitationEntity, (inv) => inv.team)
-  invitations: InvitationEntity[];
+  @OneToMany(() => InvitationEntity, (inv) => inv.equipo)
+  invitaciones: InvitationEntity[];
 }

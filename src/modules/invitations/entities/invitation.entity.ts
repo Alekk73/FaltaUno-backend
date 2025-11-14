@@ -13,15 +13,17 @@ export class InvitationEntity extends BaseEntity {
   })
   estado: StatusInvitation;
 
-  @ManyToOne(() => UserEntity, (user) => user.invitations)
+  @ManyToOne(() => UserEntity, (user) => user.invitaciones)
   @JoinColumn({ name: 'creador_id' })
-  creator: UserEntity;
+  creador: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.invitations)
+  @ManyToOne(() => UserEntity, (user) => user.invitaciones)
   @JoinColumn({ name: 'invitado_id' })
-  guest: UserEntity;
+  invitado: UserEntity;
 
-  @ManyToOne(() => TeamEntity, (team) => team.invitations)
+  @ManyToOne(() => TeamEntity, (team) => team.invitaciones, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'equipo_id' })
-  team: TeamEntity;
+  equipo: TeamEntity;
 }

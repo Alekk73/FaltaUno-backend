@@ -31,6 +31,6 @@ export class UserEntity extends BaseEntity implements IUser {
   @JoinColumn({ name: 'equipo_id' })
   equipo: TeamEntity | null;
 
-  @OneToMany(() => InvitationEntity, (inv) => inv.creator)
-  invitations: InvitationEntity[];
+  @OneToMany(() => InvitationEntity, (inv) => inv.creador)
+  invitaciones: InvitationEntity[];
 }
