@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { IUser } from '../user.interface';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
 import { TeamEntity } from 'src/modules/teams/entities/team.entity';
+import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
 
 @Entity({ name: 'usuarios' })
 export class UserEntity extends BaseEntity implements IUser {
@@ -29,4 +30,7 @@ export class UserEntity extends BaseEntity implements IUser {
   })
   @JoinColumn({ name: 'equipo_id' })
   equipo: TeamEntity | null;
+
+  @OneToMany(() => InvitationEntity, (inv) => inv.creator)
+  invitations: InvitationEntity[];
 }
