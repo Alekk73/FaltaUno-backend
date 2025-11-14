@@ -1,4 +1,5 @@
 import { BaseEntity } from 'src/common/base.entity';
+import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
 import { UserEntity } from 'src/modules/users/entities/user.entity';
 import { Column, Entity, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 
@@ -13,4 +14,7 @@ export class TeamEntity extends BaseEntity {
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'creador_id' })
   creador: UserEntity;
+
+  @OneToMany(() => InvitationEntity, (inv) => inv.equipo)
+  invitaciones: InvitationEntity[];
 }
