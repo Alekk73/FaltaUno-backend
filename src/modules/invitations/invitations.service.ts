@@ -91,6 +91,10 @@ export class InvitationsService {
     invitationId: number,
   ): Promise<{ message: string }> {
     const invitation = await this.findById(invitationId);
+
+    if (invitation.invitado.id !== invitationId)
+      throw new BadRequestException('No puedes aceptar esta invitación');
+
     const user = await this.userService.findOne(userData.id);
     const team = invitation.equipo;
 
