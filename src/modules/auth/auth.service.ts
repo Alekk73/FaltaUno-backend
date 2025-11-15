@@ -89,4 +89,10 @@ export class AuthService {
 
     return { accessToken, user: existUser };
   }
+
+  async profile(userData: JwtPayload) {
+    const user = await this.userService.findOne(userData.id);
+
+    return user;
+  }
 }
