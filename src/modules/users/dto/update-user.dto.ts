@@ -26,5 +26,5 @@ export class UpdateUserDto {
   rol?: RolesUser;
 
   @IsOptional()
-  equipo_id?: number;
+  equipo?: number;
 }
