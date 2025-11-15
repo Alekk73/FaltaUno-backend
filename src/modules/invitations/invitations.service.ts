@@ -7,11 +7,12 @@ import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InvitationEntity } from './entities/invitation.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { UsersService } from '../users/users.service';
 import { TeamsService } from '../teams/teams.service';
 import { StatusInvitation } from 'src/common/enums/status-invitation.enum';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Injectable()
 export class InvitationsService {
@@ -65,6 +66,74 @@ export class InvitationsService {
     await this.invitationRepository.save(newInvitation);
 
     return await this.findById(newInvitation.id);
+  }
+
+  async findPendingInvitationsForUser(
+    userData: JwtPayload,
+  ): Promise<InvitationEntity[]> {
+    const invitations = await this.invitationRepository.find({
+      where: {
+        invitado: { id: userData.id },
+        estado: StatusInvitation.PENDING,
+      },
+      relations: ['creador', 'invitado', 'equipo'],
+      select: this.responseQuery,
+    });
+
+    if (invitations.length === 0)
+      throw new NotFoundException('No se encontraron invitaciónes pendientes');
+
+    return invitations;
+  }
+
+  async acceptInvitation(
+    userData: JwtPayload,
+    invitationId: number,
+  ): Promise<{ message: string }> {
+    const invitation = await this.findById(invitationId);
+    const user = await this.userService.findOne(userData.id);
+    const team = invitation.equipo;
+
+    await this.invitationRepository.update(invitation.id, {
+      estado: StatusInvitation.ACCEPTED,
+    });
+
+    await this.userService.update(user.id, {
+      rol: RolesUser.jugador,
+      equipo: team.id,
+    });
+
+    await this.rejectPendingInvitations(userData);
+
+    return { message: 'Invitación aceptada' };
+  }
+
+  async rejectInvitation(invitationId: number): Promise<{ message: string }> {
+    const invitation = await this.findById(invitationId);
+
+    await this.invitationRepository.update(invitation.id, {
+      estado: StatusInvitation.REJECTED,
+    });
+
+    return { message: `Invitación rechazada` };
+  }
+
+  private async rejectPendingInvitations(userData: JwtPayload) {
+    let allInvitations: InvitationEntity[] = [];
+
+    try {
+      allInvitations = await this.findPendingInvitationsForUser(userData);
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) throw error;
+    }
+
+    if (allInvitations.length > 0) {
+      await this.invitationRepository.update(
+        // Con In de TypeORM se actualizan uno o varias invitaciones a la vez
+        { id: In(allInvitations.map((inv) => inv.id)) },
+        { estado: StatusInvitation.REJECTED },
+      );
+    }
   }
 
   private responseQuery = {
