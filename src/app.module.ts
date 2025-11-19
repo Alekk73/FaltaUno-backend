@@ -7,6 +7,7 @@ import { TeamsModule } from './modules/teams/teams.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { InvitationsModule } from './modules/invitations/invitations.module';
+import { CanchasModule } from './modules/canchas/canchas.module'; 
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
     AuthModule,
     TeamsModule,
     InvitationsModule,
+    CanchasModule,
   ],
   providers: [
     {
@@ -26,3 +28,4 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
   ],
 })
 export class AppModule {}
+
