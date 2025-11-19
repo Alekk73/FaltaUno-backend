@@ -8,7 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { InvitationsModule } from './modules/invitations/invitations.module';
 import { MatchesModule } from './modules/matches/matches.module';
-import { CanchasModule } from './modules/canchas/canchas.module';
+import { FieldsModule } from './modules/fields/fields.module';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { CanchasModule } from './modules/canchas/canchas.module';
     TeamsModule,
     InvitationsModule,
     MatchesModule,
-    CanchasModule,
+    FieldsModule,
   ],
   providers: [
     {
