@@ -7,7 +7,9 @@ import { TeamsModule } from './modules/teams/teams.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { InvitationsModule } from './modules/invitations/invitations.module';
-import { CanchasModule } from './modules/canchas/canchas.module'; 
+import { MatchesModule } from './modules/matches/matches.module';
+import { FieldsModule } from './modules/fields/fields.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,7 +20,8 @@ import { CanchasModule } from './modules/canchas/canchas.module';
     AuthModule,
     TeamsModule,
     InvitationsModule,
-    CanchasModule,
+    MatchesModule,
+    FieldsModule,
   ],
   providers: [
     {
@@ -28,4 +31,3 @@ import { CanchasModule } from './modules/canchas/canchas.module';
   ],
 })
 export class AppModule {}
-
