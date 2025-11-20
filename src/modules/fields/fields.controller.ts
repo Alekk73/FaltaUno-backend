@@ -11,7 +11,7 @@ import { FieldsService } from './fields.service';
 import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
 
-@Controller('canchas')
+@Controller('fields')
 export class FieldsController {
   constructor(private readonly canchasService: FieldsService) {}
 
