@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Req,
-  UseGuards,
   ParseIntPipe,
   Put,
 } from '@nestjs/common';
@@ -34,6 +33,16 @@ export class MatchesController {
   async create(@Req() req: Request, @Body() dto: CreateMatchDto) {
     const user = req.user;
     return await this.matchesService.create(user, dto);
+  }
+
+  @Put(':id')
+  async update(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateMatchDto,
+  ) {
+    const user = req.user;
+    return await this.matchesService.update(user, id, dto);
   }
 
   @Delete(':id')
