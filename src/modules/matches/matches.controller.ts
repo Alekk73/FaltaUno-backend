@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Req,
-  UseGuards,
   ParseIntPipe,
   Put,
 } from '@nestjs/common';
@@ -15,9 +14,6 @@ import { MatchesService } from './matches.service';
 import type { Request } from 'express';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Controller('matches')
 export class MatchesController {
