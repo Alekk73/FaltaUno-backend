@@ -6,15 +6,21 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { FieldsService } from './fields.service';
 import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Controller('fields')
 export class FieldsController {
   constructor(private readonly canchasService: FieldsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.admin)
   @Post()
   create(@Body() dto: CreateFieldDto) {
     return this.canchasService.create(dto);
@@ -30,6 +36,8 @@ export class FieldsController {
     return this.canchasService.findOne(+id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.admin)
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateFieldDto) {
     return this.canchasService.update(+id, dto);
