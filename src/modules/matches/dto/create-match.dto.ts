@@ -1,12 +1,10 @@
 import { Type } from 'class-transformer';
 import {
-  IsEnum,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
-  IsString,
   ValidateNested,
 } from 'class-validator';
-import { MatchSchedules } from 'src/common/enums/match-schedules';
 
 class PartidoDto {
   @IsNotEmpty()
@@ -20,12 +18,8 @@ class PartidoDto {
 
 export class CreateMatchDto {
   @IsNotEmpty()
-  @IsEnum(MatchSchedules)
-  hora: MatchSchedules;
-
-  @IsNotEmpty()
-  @IsString()
-  dia: Date;
+  @IsDateString()
+  hora_dia: string;
 
   @ValidateNested()
   @Type(() => PartidoDto)

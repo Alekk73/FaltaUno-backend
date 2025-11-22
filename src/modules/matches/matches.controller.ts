@@ -15,6 +15,9 @@ import { MatchesService } from './matches.service';
 import type { Request } from 'express';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Controller('matches')
 export class MatchesController {
@@ -34,6 +37,16 @@ export class MatchesController {
   async create(@Req() req: Request, @Body() dto: CreateMatchDto) {
     const user = req.user;
     return await this.matchesService.create(user, dto);
+  }
+
+  @Put(':id')
+  async update(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateMatchDto,
+  ) {
+    const user = req.user;
+    return await this.matchesService.update(user, id, dto);
   }
 
   @Delete(':id')

@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
@@ -62,10 +63,10 @@ export class MatchesService {
     userData: JwtPayload,
     dto: CreateMatchDto,
   ): Promise<MatchEntity> {
-    const date = new Date(`${dto.dia}T${dto.hora}:00:00`);
+    const date = new Date(dto.hora_dia);
 
-    await this.fieldService.findOne(dto.partido.canchaId);
-    await this.teamService.findById(dto.partido.contrincante);
+    if (dto.partido.contrincante === userData.equipoId)
+      throw new BadRequestException('No puedes crear un partido contra tí');
 
     try {
       const newMatch = this.matchRepository.create({
@@ -98,12 +99,75 @@ export class MatchesService {
     }
   }
 
+  async update(userData: JwtPayload, id: number, dto: UpdateMatchDto) {
+    const findMatch = await this.findById(id);
+    const newOpponent = dto.partido?.contrincante;
+
+    const verifyCreator = this.verifyCreatorMatch(findMatch, userData.id);
+
+    if (!verifyCreator)
+      throw new UnauthorizedException(
+        'No tienes permisos para realizar esta acción',
+      );
+
+    if (newOpponent === userData.equipoId)
+      throw new BadRequestException('Error al actualizar al información');
+
+    if (dto.hora_dia) {
+      findMatch.hora_dia = new Date(dto.hora_dia);
+    }
+
+    if (dto.partido?.canchaId) {
+      findMatch.cancha = { id: dto.partido.canchaId } as any;
+    }
+
+    if (newOpponent) {
+      const opponentTeam = await this.matchTeamRepository.findOne({
+        where: {
+          partido: { id: findMatch.id },
+          es_local: false,
+        },
+        relations: ['equipo'],
+      });
+      if (!opponentTeam) {
+        throw new InternalServerErrorException(
+          'Registro de equipo visitante no encontrado',
+        );
+      }
+
+      const completeTeam = await this.teamService.findById(newOpponent);
+      if (!completeTeam)
+        throw new BadRequestException('Contrincante no encontrado');
+
+      opponentTeam!.equipo = completeTeam;
+
+      await this.matchTeamRepository.save(opponentTeam);
+    }
+
+    try {
+      await this.matchRepository.save(findMatch);
+      return await this.findById(id);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(
+          'Ya existe un partido con esa hora y cancha',
+        );
+      } else {
+        throw new InternalServerErrorException(
+          'Error al actualizar el partido',
+        );
+      }
+    }
+  }
+
   async remove(userData: JwtPayload, id: number) {
     const findMatch = await this.findById(id);
-    const teamsIds = findMatch.equipos.map((e) => e.equipo.id);
+    const verifyCreator = this.verifyCreatorMatch(findMatch, userData.id);
 
-    if (!teamsIds.includes(userData.id))
-      throw new BadRequestException('No puedes eliminar el partido');
+    if (!verifyCreator)
+      throw new UnauthorizedException(
+        'No tienes permiso para realizar esta acción',
+      );
 
     await this.matchRepository.remove(findMatch);
   }
@@ -137,5 +201,17 @@ export class MatchesService {
         nombre: match.cancha.nombre,
       },
     }));
+  }
+
+  private verifyCreatorMatch(match: MatchEntity, userId: number) {
+    const localTeam = match.equipos.find((equipo) => equipo.es_local);
+
+    if (!localTeam || !localTeam.equipo || !localTeam.equipo.creador) {
+      throw new Error(
+        'El equipo local o el capitán no están definidos correctamente.',
+      );
+    }
+
+    return localTeam.equipo.creador.id === userId;
   }
 }
