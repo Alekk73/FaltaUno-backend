@@ -81,10 +81,4 @@ export class UsersService {
     Object.assign(user, updateUserDto);
     return await this.userRepository.save(user);
   }
-
-  // Prueba funcionamiento RolesGuard a futuro
-  // se reaalizara de forma correcta
-  async changeCaptain() {
-    console.log('Soy capitan');
-  }
 }
