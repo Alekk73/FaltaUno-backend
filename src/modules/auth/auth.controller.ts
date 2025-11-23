@@ -6,32 +6,61 @@ import {
   Post,
   Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { Request, Response } from 'express';
 import { Public } from 'src/common/decorators/public.decorator';
-import { AuthGuard } from './guards/auth.guard';
+import {
+  ApiOperation,
+  ApiBody,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // -------------------------
+  //  PROFILE
+  // -------------------------
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  @ApiOkResponse({ description: 'Perfil obtenido correctamente' })
   @Get('profile')
   async profile(@Req() req: Request) {
     const user = req.user;
     return await this.authService.profile(user);
   }
 
+  // -------------------------
+  //  REGISTER
+  // -------------------------
   @Public()
+  @ApiBody({ type: RegisterDto })
+  @ApiOperation({ summary: 'Registrar un nuevo usuario' })
+  @ApiCreatedResponse({ description: 'Usuario creado correctamente' })
+  @ApiBadRequestResponse({
+    description:
+      'Correo electrónico ingresado ya existente o error al crear el usuario',
+  })
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     return await this.authService.register(dto);
   }
 
+  // -------------------------
+  //  LOGIN
+  // -------------------------
   @Public()
+  @ApiBody({ type: LoginDto })
+  @ApiOperation({ summary: 'Inicio de sesión' })
+  @ApiOkResponse({ description: 'Usuario autenticado' })
+  @ApiNotFoundResponse({ description: 'Usuario no encontrado' })
+  @ApiBadRequestResponse({ description: 'Contraseña incorrecta' })
   @Post('login')
   async login(
     @Body() dto: LoginDto,
@@ -49,6 +78,11 @@ export class AuthController {
     return user;
   }
 
+  // -------------------------
+  //  LOGOUT
+  // -------------------------
+  @ApiOperation({ summary: 'Cerrar sesión' })
+  @ApiOkResponse({ description: 'Sesión cerrada correctamente' })
   @Post('logout')
   @HttpCode(200)
   logout(@Res({ passthrough: true }) res: Response) {
