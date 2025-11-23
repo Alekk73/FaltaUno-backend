@@ -1,5 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -17,9 +23,19 @@ export class RegisterDto {
   @IsEmail()
   correo_electronico: string;
 
-  @ApiProperty({ example: '123456' })
+  @ApiProperty({ example: 'A_a123456' })
   @IsString()
-  @MinLength(6)
+  @MinLength(8, { message: 'La contraseña debe tener mínimo 8 caracteres.' })
+  @Matches(/[A-Z]/, {
+    message: 'La contraseña debe tener al menos una letra mayúscula.',
+  })
+  @Matches(/[a-z]/, {
+    message: 'La contraseña debe tener al menos una letra minúscula.',
+  })
+  @Matches(/\d/, { message: 'La contraseña debe tener al menos un número.' })
+  @Matches(/[!@#$%^&*(),.?":{}|<>_]/, {
+    message: 'La contraseña debe tener al menos un carácter especial.',
+  })
   @Transform(({ value }) => value.trim())
   contrasena: string;
 }
