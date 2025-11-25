@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import expressBasicAuth from 'express-basic-auth';
+import { SwaggerConfigModule } from './common/swagger/swagger.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,14 +18,8 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
-  const config = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('Documentación de la API')
-    .setVersion('1.0')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Configuracion Swagger
+  SwaggerConfigModule.setupSwagger(app, configService);
 
   const port = +configService.get('PORT');
   await app.listen(port);
