@@ -9,6 +9,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { InvitationsModule } from './modules/invitations/invitations.module';
 import { MatchesModule } from './modules/matches/matches.module';
 import { FieldsModule } from './modules/fields/fields.module';
+import { SwaggerConfigModule } from './common/swagger/swagger.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FieldsModule } from './modules/fields/fields.module';
     InvitationsModule,
     MatchesModule,
     FieldsModule,
+    SwaggerConfigModule,
   ],
   providers: [
     {
