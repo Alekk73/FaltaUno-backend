@@ -7,13 +7,12 @@ import {
   ParseIntPipe,
   HttpStatus,
   HttpCode,
-  UseGuards,
+  Delete,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import type { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -34,10 +33,10 @@ export class UsersController {
     return await this.usersService.update(id, updateUserDto);
   }
 
-  @Get('change-captain')
-  @Roles(RolesUser.capitan)
-  @UseGuards(RolesGuard)
-  async changeCaptain() {
-    return this.usersService.changeCaptain();
+  @Delete()
+  @HttpCode(HttpStatus.OK)
+  async remove(@Req() req: Request) {
+    const user = req.user;
+    return await this.usersService.remove(user.id);
   }
 }

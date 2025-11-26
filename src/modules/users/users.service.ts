@@ -82,9 +82,11 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  // Prueba funcionamiento RolesGuard a futuro
-  // se reaalizara de forma correcta
-  async changeCaptain() {
-    console.log('Soy capitan');
+  async remove(userId: number): Promise<{ message: string }> {
+    const user = await this.findOne(userId);
+
+    await this.userRepository.delete({ id: user.id });
+
+    return { message: 'Usuario eliminado correctamente' };
   }
 }
