@@ -9,11 +9,15 @@ import {
   Req,
   ParseIntPipe,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import type { Request } from 'express';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Controller('matches')
 export class MatchesController {
@@ -29,12 +33,16 @@ export class MatchesController {
     return await this.matchesService.findById(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateMatchDto) {
     const user = req.user;
     return await this.matchesService.create(user, dto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
   @Put(':id')
   async update(
     @Req() req: Request,
@@ -45,6 +53,8 @@ export class MatchesController {
     return await this.matchesService.update(user, id, dto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
   @Delete(':id')
   async remove(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;

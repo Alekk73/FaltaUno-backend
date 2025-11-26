@@ -21,5 +21,6 @@ export class MatchTeamEntity extends BaseEntity {
   partido: MatchEntity;
 
   @ManyToOne(() => TeamEntity, (team) => team.partido)
+  @JoinColumn({ name: 'equipo_id' })
   equipo: TeamEntity;
 }
