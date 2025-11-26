@@ -4,13 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
-import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InvitationEntity } from './entities/invitation.entity';
 import { In, Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { UsersService } from '../users/users.service';
-import { TeamsService } from '../teams/teams.service';
 import { StatusInvitation } from 'src/common/enums/status-invitation.enum';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 
@@ -92,7 +90,7 @@ export class InvitationsService {
   ): Promise<{ message: string }> {
     const invitation = await this.findById(invitationId);
 
-    if (invitation.invitado.id !== invitationId)
+    if (invitation.invitado.id !== userData.id)
       throw new BadRequestException('No puedes aceptar esta invitación');
 
     const user = await this.userService.findOne(userData.id);
