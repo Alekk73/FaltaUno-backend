@@ -60,4 +60,10 @@ export class MatchesController {
     const user = req.user;
     return await this.matchesService.remove(user, id);
   }
+
+  @Patch('leave/:id')
+  async leaveMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    const user = req.user;
+    return await this.matchesService.leaveMatch(user, id);
+  }
 }

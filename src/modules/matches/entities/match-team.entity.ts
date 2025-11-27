@@ -20,7 +20,7 @@ export class MatchTeamEntity extends BaseEntity {
   @JoinColumn({ name: 'partido_id' })
   partido: MatchEntity;
 
-  @ManyToOne(() => TeamEntity, (team) => team.partido)
+  @ManyToOne(() => TeamEntity, (team) => team.partido, { nullable: true })
   @JoinColumn({ name: 'equipo_id' })
-  equipo: TeamEntity;
+  equipo: TeamEntity | null;
 }
