@@ -25,7 +25,6 @@ export class MatchesService {
 
     private readonly teamService: TeamsService,
   ) {}
-
   async findAll(): Promise<MatchEntity[]> {
     const matches = await this.matchRepository.find({
       relations: [
@@ -56,6 +55,20 @@ export class MatchesService {
     if (!match) throw new NotFoundException('Partido no encontrado');
 
     return match;
+  }
+
+  async findByUser(userData: JwtPayload) {
+    const matches = await this.matchTeamRepository.find({
+      where: { equipo: { creador: { id: userData.id } } },
+      relations: ['equipo', 'partido'],
+    });
+
+    if (matches.length === 0)
+      throw new NotFoundException(
+        'No se encontraron partidos para este equipo',
+      );
+
+    return matches;
   }
 
   async create(
@@ -141,6 +154,23 @@ export class MatchesService {
     await this.matchTeamRepository.save(opponentTeam);
 
     return { message: 'Has salido del partido correctamente' };
+  }
+
+  async joinMatch(userData: JwtPayload, id: number) {
+    const findMatch = await this.findById(id);
+    const freeVacant = findMatch.equipos.find((vacant) => !vacant.equipo);
+    const team = await this.teamService.findById(userData.equipoId as number);
+
+    if (team.id === userData.equipoId)
+      throw new BadRequestException('No puedes unirte al partido');
+
+    if (!freeVacant) throw new BadRequestException('No existe vacante libre');
+
+    freeVacant.equipo = team;
+
+    await this.matchTeamRepository.save(freeVacant);
+
+    return { message: 'Te uniste al partido correctamente' };
   }
 
   // METODOS PRIVADOS
