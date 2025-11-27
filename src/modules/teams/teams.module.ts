@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { TeamsController } from './teams.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TeamEntity } from './entities/team.entity';
+import { TeamEntity } from './entity/team.entity';
 import { UsersModule } from '../users/users.module';
 
 @Module({

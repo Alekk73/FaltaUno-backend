@@ -3,7 +3,7 @@ import { IUser } from '../user.interface';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
-import { TeamEntity } from 'src/modules/teams/entities/team.entity';
+import { TeamEntity } from 'src/modules/teams/entity/team.entity';
 import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
 
 @Entity({ name: 'usuarios' })

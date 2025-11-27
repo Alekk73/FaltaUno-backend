@@ -1,6 +1,7 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { MatchEntity } from 'src/modules/matches/entities/match.entity';
-import { Entity, Column, OneToMany, ManyToOne } from 'typeorm';
+import { MatchEntity } from 'src/modules/matches/entity/match.entity';
+import { ScheduleEntity } from '../../schedules/entity/schedule.entity';
+import { Entity, Column, OneToMany } from 'typeorm';
 
 @Entity({ name: 'canchas' })
 export class FieldEntity extends BaseEntity {
@@ -9,4 +10,8 @@ export class FieldEntity extends BaseEntity {
 
   @OneToMany(() => MatchEntity, (match) => match.cancha)
   partidos: MatchEntity[];
+
+  
+  @OneToMany(() => ScheduleEntity, (schedule) => schedule.field)
+  schedules: ScheduleEntity[];
 }
