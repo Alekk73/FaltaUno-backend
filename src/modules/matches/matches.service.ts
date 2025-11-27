@@ -14,8 +14,6 @@ import { Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { MatchTeamEntity } from './entities/match-team.entity';
 import { TeamsService } from '../teams/teams.service';
-import { UsersService } from '../users/users.service';
-import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class MatchesService {
@@ -26,7 +24,6 @@ export class MatchesService {
     private readonly matchTeamRepository: Repository<MatchTeamEntity>,
 
     private readonly teamService: TeamsService,
-    private readonly userService: UsersService,
   ) {}
 
   async findAll(): Promise<MatchEntity[]> {
@@ -98,14 +95,12 @@ export class MatchesService {
     dto: UpdateMatchDto,
   ): Promise<MatchEntity | void> {
     const findMatch = await this.findById(id);
-    const newOpponent = await this.userService.findOne(
-      dto.partido?.contrincante as number,
-    );
+    const newOpponent = dto.partido?.contrincante;
 
     this.checkMatchCreator(findMatch, userData.id);
-    this.checkOpponent(findMatch.id, newOpponent);
+    this.checkOpponent(findMatch.id, newOpponent as number);
 
-    await this.updateMatchDetails(findMatch, dto, newOpponent);
+    await this.updateMatchDetails(findMatch, dto, newOpponent as number);
 
     try {
       await this.matchRepository.save(findMatch);
@@ -127,23 +122,37 @@ export class MatchesService {
     await this.matchRepository.remove(findMatch);
   }
 
-  // METODOS PRIVADOS
-  private async updateOpponentTeam(match: MatchEntity, opponent: UserEntity) {
-    const opponentTeam = await this.matchTeamRepository.findOne({
-      where: {
-        partido: { id: match.id },
-        es_local: false,
-      },
-      relations: ['equipo'],
-    });
-
+  async leaveMatch(userData: JwtPayload, id: number) {
+    const findMatch = await this.findById(id);
+    const opponentTeam = findMatch.equipos.find((team) => !team.es_local);
     if (!opponentTeam) {
       throw new InternalServerErrorException(
-        'Registro de equipo visitante no encontrado',
+        'Registro de equipos visitante no encontrado',
       );
     }
 
-    const completeTeam = await this.teamService.findById(opponent.id);
+    if (userData.equipoId !== opponentTeam.equipo?.id)
+      throw new UnauthorizedException(
+        'No tienes permisos para ejecutar la acción',
+      );
+
+    opponentTeam.equipo = null;
+
+    await this.matchTeamRepository.save(opponentTeam);
+
+    return { message: 'Has salido del partido correctamente' };
+  }
+
+  // METODOS PRIVADOS
+  private async updateOpponentTeam(match: MatchEntity, opponent: number) {
+    const opponentTeam = match.equipos.find((team) => !team.es_local);
+    if (!opponentTeam) {
+      throw new InternalServerErrorException(
+        'Registro de equipos visitante no encontrado',
+      );
+    }
+
+    const completeTeam = await this.teamService.findById(opponent);
     if (!completeTeam) {
       throw new BadRequestException('Contrincante no encontrado');
     }
@@ -155,7 +164,7 @@ export class MatchesService {
   private async updateMatchDetails(
     match: MatchEntity,
     dto: UpdateMatchDto,
-    opponent: UserEntity,
+    opponent: number,
   ) {
     if (dto.hora_dia) {
       match.hora_dia = new Date(dto.hora_dia);
@@ -178,8 +187,8 @@ export class MatchesService {
     });
   }
 
-  private checkOpponent(teamId: number, opponent: UserEntity) {
-    if (opponent.id === teamId) {
+  private checkOpponent(teamId: number, opponentId: number) {
+    if (opponentId === teamId) {
       throw new BadRequestException('Error al actualizar al información');
     }
   }
@@ -212,12 +221,12 @@ export class MatchesService {
       hora_dia: match.hora_dia,
       equipos: match.equipos.map((matchTeam) => ({
         equipo: {
-          id: matchTeam.equipo.id,
-          nombre: matchTeam.equipo.nombre,
+          id: matchTeam.equipo?.id,
+          nombre: matchTeam.equipo?.nombre,
           creador: {
-            id: matchTeam.equipo.creador.id,
-            nombre: matchTeam.equipo.creador.nombre,
-            apellido: matchTeam.equipo.creador.apellido,
+            id: matchTeam.equipo?.creador.id,
+            nombre: matchTeam.equipo?.creador.nombre,
+            apellido: matchTeam.equipo?.creador.apellido,
           },
         },
       })),
