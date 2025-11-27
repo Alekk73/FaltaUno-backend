@@ -1,5 +1,5 @@
 import { RolesUser } from 'src/common/enums/roles-user.enum';
-import { TeamEntity } from '../teams/entities/team.entity';
+import { TeamEntity } from '../teams/entity/team.entity';
 
 export interface IUser {
   nombre: string;

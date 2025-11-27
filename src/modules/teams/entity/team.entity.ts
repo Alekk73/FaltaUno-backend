@@ -1,7 +1,7 @@
 import { BaseEntity } from 'src/common/base.entity';
 import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
-import { MatchTeamEntity } from 'src/modules/matches/entities/match-team.entity';
-import { UserEntity } from 'src/modules/users/entities/user.entity';
+import { MatchTeamEntity } from 'src/modules/matches/entity/match-team.entity';
+import { UserEntity } from 'src/modules/users/entity/user.entity';
 import { Column, Entity, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity({ name: 'equipos' })

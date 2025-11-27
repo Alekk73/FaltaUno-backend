@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 import { JwtPayload } from 'src/common/jwt-payload';
-import { UserEntity } from 'src/modules/users/entities/user.entity';
+import { UserEntity } from 'src/modules/users/entity/user.entity';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
