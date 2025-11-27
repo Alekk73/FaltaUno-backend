@@ -22,6 +22,11 @@ import { RolesUser } from 'src/common/enums/roles-user.enum';
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
+  @Get('me')
+  async findByUser(@Req() req: Request) {
+    const user = req.user;
+    return await this.matchesService.findByUser(user);
+  }
 
   @Get()
   async findAll() {
@@ -65,5 +70,11 @@ export class MatchesController {
   async leaveMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;
     return await this.matchesService.leaveMatch(user, id);
+  }
+
+  @Patch('join/:id')
+  async joinMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    const user = req.user;
+    return await this.matchesService.joinMatch(user, id);
   }
 }

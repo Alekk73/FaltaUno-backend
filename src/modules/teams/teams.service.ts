@@ -74,10 +74,6 @@ export class TeamsService {
 
   // Actualiza un equipo
   async update(userData: JwtPayload, dto: UpdateTeamDto): Promise<TeamEntity> {
-    if (userData.rol !== RolesUser.capitan) {
-      throw new BadRequestException('No eres el capitan del equipo');
-    }
-
     const newNameTeamInUse = await this.teamRepository.findOne({
       where: { nombre: dto.nombre },
     });
@@ -104,10 +100,6 @@ export class TeamsService {
 
     if (!team) {
       throw new NotFoundException('Equipo no encontrado');
-    }
-
-    if (team.creador.id !== userData.id) {
-      throw new ForbiddenException('Solo el capitán puede eliminar el equipo');
     }
 
     for (const user of team.usuarios) {
