@@ -3,6 +3,7 @@ import {
   IsDateString,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   ValidateNested,
 } from 'class-validator';
 
@@ -11,9 +12,9 @@ class PartidoDto {
   @IsNumber()
   canchaId: number;
 
-  @IsNotEmpty()
   @IsNumber()
-  contrincante: number;
+  @IsOptional()
+  contrincante?: number;
 }
 
 export class CreateMatchDto {

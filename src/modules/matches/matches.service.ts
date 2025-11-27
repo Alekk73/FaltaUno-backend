@@ -14,6 +14,7 @@ import { Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { MatchTeamEntity } from './entities/match-team.entity';
 import { TeamsService } from '../teams/teams.service';
+import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
 
 @Injectable()
 export class MatchesService {
@@ -76,10 +77,7 @@ export class MatchesService {
     dto: CreateMatchDto,
   ): Promise<MatchEntity | void> {
     const date = new Date(dto.hora_dia);
-    const opponent = await this.teamService.findById(dto.partido.contrincante);
-
-    if (opponent.id === userData.equipoId)
-      throw new BadRequestException('No puedes crear un partido contra tí');
+    const opponentId = dto.partido.contrincante as number;
 
     try {
       const newMatch = this.matchRepository.create({
@@ -91,8 +89,18 @@ export class MatchesService {
 
       const matchTeams = [
         this.createMatchTeam(userData.equipoId as number, true, newMatch.id),
-        this.createMatchTeam(opponent.id, false, newMatch.id),
       ];
+
+      if (opponentId !== undefined && opponentId !== null) {
+        if (opponentId === userData.equipoId)
+          throw new BadRequestException(
+            'No puedes crear un partido contra ti mismo',
+          );
+
+        const opponent = await this.teamService.findById(opponentId);
+
+        matchTeams.push(this.createMatchTeam(opponent.id, false, newMatch.id));
+      }
 
       await this.matchTeamRepository.save(matchTeams);
 
@@ -149,28 +157,89 @@ export class MatchesService {
         'No tienes permisos para ejecutar la acción',
       );
 
-    opponentTeam.equipo = null;
-
-    await this.matchTeamRepository.save(opponentTeam);
+    await this.matchTeamRepository.remove(opponentTeam);
 
     return { message: 'Has salido del partido correctamente' };
   }
 
   async joinMatch(userData: JwtPayload, id: number) {
-    const findMatch = await this.findById(id);
-    const freeVacant = findMatch.equipos.find((vacant) => !vacant.equipo);
-    const team = await this.teamService.findById(userData.equipoId as number);
+    const match = await this.findById(id);
 
-    if (team.id === userData.equipoId)
-      throw new BadRequestException('No puedes unirte al partido');
+    if (match.equipos.length >= 2)
+      throw new BadRequestException('El partido ya tiene dos equipos');
 
-    if (!freeVacant) throw new BadRequestException('No existe vacante libre');
+    const teamLocal = match.equipos.some(
+      (matchTeam) => matchTeam.equipo?.id === userData.equipoId,
+    );
+    if (teamLocal) {
+      throw new BadRequestException(
+        'Este equipo ya está participando en el partido',
+      );
+    }
 
-    freeVacant.equipo = team;
+    const newTeam = this.createMatchTeam(
+      userData.equipoId as number,
+      false,
+      match.id,
+    );
 
-    await this.matchTeamRepository.save(freeVacant);
+    await this.matchTeamRepository.save(newTeam);
 
     return { message: 'Te uniste al partido correctamente' };
+  }
+
+  async changeResult(userData: JwtPayload, id: number, dto: UpdateMatchDto) {
+    const findMatch = await this.findById(id);
+    if (
+      findMatch.estado_resultado ===
+      (MatchStatusResult.CONFIRMADO || MatchStatusResult.INDEFINIDO)
+    ) {
+      throw new BadRequestException('No se puede cambiar el resultado');
+    }
+
+    const teams = findMatch.equipos;
+
+    const localTeam = teams.find((team) => team.es_local) as MatchTeamEntity;
+    if (localTeam.equipo?.id !== userData.equipoId)
+      throw new UnauthorizedException(
+        'No puedes cambiar el resultado del partido',
+      );
+
+    if (dto.goles_local !== undefined || dto.goles_visitante !== undefined) {
+      for (const matchTeam of teams) {
+        if (matchTeam.es_local) {
+          matchTeam.goles_local = dto.goles_local as number;
+        } else {
+          matchTeam.goles_visitante = dto.goles_visitante as number;
+        }
+      }
+    }
+
+    await this.matchTeamRepository.save(teams);
+
+    findMatch.estado_resultado = MatchStatusResult.CONFIRMACION_PENDIENTE;
+
+    await this.matchRepository.save(findMatch);
+
+    return { message: 'Resultado actualizado' };
+  }
+
+  async confirmResult(userData: JwtPayload, id: number) {
+    const findMatch = await this.findById(id);
+    const teams = findMatch.equipos;
+
+    const visitorTeam = teams.find((team) => !team.es_local) as MatchTeamEntity;
+    if (visitorTeam.equipo?.id !== userData.equipoId) {
+      throw new UnauthorizedException(
+        'No tienes autorización para realizar la acción',
+      );
+    }
+
+    findMatch.estado_resultado = MatchStatusResult.CONFIRMADO;
+
+    await this.matchRepository.save(findMatch);
+
+    return { message: 'Resultado confirmado' };
   }
 
   // METODOS PRIVADOS

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { MatchTeamEntity } from './match-team.entity';
 import { FieldEntity } from 'src/modules/fields/entity/field.entity';
+import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
 
 @Entity({ name: 'partidos' })
 // Se le da un nombre al UNIQUE compuesto se cree bien y se pueda lanzar el error 23505 cuando hay duplicados
@@ -16,6 +17,13 @@ import { FieldEntity } from 'src/modules/fields/entity/field.entity';
 export class MatchEntity extends BaseEntity {
   @Column({ type: 'timestamp', nullable: false })
   hora_dia: Date;
+
+  @Column({
+    type: 'enum',
+    enum: MatchStatusResult,
+    default: MatchStatusResult.SIN_CARGAR,
+  })
+  estado_resultado: MatchStatusResult;
 
   @OneToMany(() => MatchTeamEntity, (mt) => mt.partido)
   equipos: MatchTeamEntity[];

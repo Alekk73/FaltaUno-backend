@@ -60,21 +60,48 @@ export class MatchesController {
 
   @UseGuards(RolesGuard)
   @Roles(RolesUser.capitan)
-  @Delete(':id')
-  async remove(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+  @Put('result/:id')
+  async changeResult(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateMatchDto,
+  ) {
     const user = req.user;
-    return await this.matchesService.remove(user, id);
+    return await this.matchesService.changeResult(user, id, dto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
+  @Patch('result/confirm/:id')
+  async confirmResult(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const user = req.user;
+    return await this.matchesService.confirmResult(user, id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
   @Patch('leave/:id')
   async leaveMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;
     return await this.matchesService.leaveMatch(user, id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
   @Patch('join/:id')
   async joinMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;
     return await this.matchesService.joinMatch(user, id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.capitan)
+  @Delete(':id')
+  async remove(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
+    const user = req.user;
+    return await this.matchesService.remove(user, id);
   }
 }
