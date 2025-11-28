@@ -6,10 +6,10 @@ import { TeamEntity } from 'src/modules/teams/entity/team.entity';
 @Entity({ name: 'partidos_equipos' })
 export class MatchTeamEntity extends BaseEntity {
   @Column({ type: 'int', nullable: true, default: null })
-  goles_local: number;
+  goles_local: number | null;
 
   @Column({ type: 'int', nullable: true, default: null })
-  goles_visitante: number;
+  goles_visitante: number | null;
 
   @Column({ type: 'boolean', default: false })
   es_local: boolean;

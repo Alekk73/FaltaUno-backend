@@ -26,6 +26,7 @@ export class MatchesService {
 
     private readonly teamService: TeamsService,
   ) {}
+
   async findAll(): Promise<MatchEntity[]> {
     const matches = await this.matchRepository.find({
       relations: [
@@ -191,8 +192,8 @@ export class MatchesService {
   async changeResult(userData: JwtPayload, id: number, dto: UpdateMatchDto) {
     const findMatch = await this.findById(id);
     if (
-      findMatch.estado_resultado ===
-      (MatchStatusResult.CONFIRMADO || MatchStatusResult.INDEFINIDO)
+      findMatch.estado_resultado === MatchStatusResult.CONFIRMADO ||
+      findMatch.estado_resultado === MatchStatusResult.INDEFINIDO
     ) {
       throw new BadRequestException('No se puede cambiar el resultado');
     }
@@ -240,6 +241,39 @@ export class MatchesService {
     await this.matchRepository.save(findMatch);
 
     return { message: 'Resultado confirmado' };
+  }
+
+  async rejecetResult(userData: JwtPayload, id: number) {
+    const match = await this.findById(id);
+
+    if (match.estado_resultado !== MatchStatusResult.CONFIRMACION_PENDIENTE) {
+      throw new BadRequestException('No puedes ejecutar la acción');
+    }
+
+    const matchTeams = match.equipos;
+    const visitorTeam = matchTeams.find(
+      (team) => !team.es_local,
+    ) as MatchTeamEntity;
+
+    if (userData.equipoId !== visitorTeam.equipo?.id)
+      throw new UnauthorizedException(
+        'No tienes autorización para realizar la acción',
+      );
+
+    matchTeams.map((team) => {
+      if (team.goles_local === null) {
+        team.goles_visitante = null;
+      } else {
+        team.goles_local = null;
+      }
+    });
+
+    match.estado_resultado = MatchStatusResult.INDEFINIDO;
+
+    await this.matchRepository.save(match);
+    await this.matchTeamRepository.save(matchTeams);
+
+    return { message: 'Resultado rechazado correctamente' };
   }
 
   // METODOS PRIVADOS
@@ -318,10 +352,16 @@ export class MatchesService {
       id: match.id,
       creadoEn: match.creadoEn,
       hora_dia: match.hora_dia,
+      estado_resultado: match.estado_resultado,
       equipos: match.equipos.map((matchTeam) => ({
         equipo: {
           id: matchTeam.equipo?.id,
           nombre: matchTeam.equipo?.nombre,
+          es_local: matchTeam.es_local,
+          goles:
+            matchTeam.es_local === true
+              ? (matchTeam.goles_local ?? 0) // se asigna 0 si el valor de los goles es null
+              : (matchTeam.goles_visitante ?? 0),
           creador: {
             id: matchTeam.equipo?.creador.id,
             nombre: matchTeam.equipo?.creador.nombre,
