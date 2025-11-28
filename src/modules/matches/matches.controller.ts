@@ -165,26 +165,6 @@ export class MatchesController {
   }
 
   // -------------------------
-  //  REJECT RESULT
-  // -------------------------
-  @ApiOperation({
-    summary: 'Rechazar resultado, solo capitan visitante del partido',
-  })
-  @ApiOkResponse({ description: 'Resultado rechazado' })
-  @ApiBadRequestResponse({ description: 'No puedes ejecutar la acción' })
-  @ApiUnauthorizedResponse({
-    description: 'No tienes autorización para realizar la acción',
-  })
-  @Patch('result/reject/:id')
-  async rejectResult(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    const user = req.user;
-    return await this.matchesService.rejecetResult(user, id);
-  }
-
-  // -------------------------
   //  LEAVE MATCH
   // -------------------------
   @ApiOperation({
