@@ -15,6 +15,7 @@ import { JwtPayload } from 'src/common/jwt-payload';
 import { MatchTeamEntity } from './entities/match-team.entity';
 import { TeamsService } from '../teams/teams.service';
 import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
+import { FieldsService } from '../fields/fields.service';
 
 @Injectable()
 export class MatchesService {
@@ -25,6 +26,7 @@ export class MatchesService {
     private readonly matchTeamRepository: Repository<MatchTeamEntity>,
 
     private readonly teamService: TeamsService,
+    private readonly fielService: FieldsService,
   ) {}
 
   async findAll(): Promise<MatchEntity[]> {
@@ -79,6 +81,8 @@ export class MatchesService {
   ): Promise<MatchEntity | void> {
     const date = new Date(dto.hora_dia);
     const opponentId = dto.partido.contrincante as number;
+
+    await this.fielService.findOne(dto.partido.canchaId);
 
     try {
       const newMatch = this.matchRepository.create({

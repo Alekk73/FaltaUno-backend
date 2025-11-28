@@ -34,6 +34,6 @@ export class MatchEntity extends BaseEntity {
   cancha: FieldEntity;
 
   // Relación con el horario
-@OneToMany(() => ScheduleEntity, (schedule) => schedule.match)
-schedules: ScheduleEntity[];
+  @OneToMany(() => ScheduleEntity, (schedule) => schedule.match)
+  schedules: ScheduleEntity[] | null;
 }
