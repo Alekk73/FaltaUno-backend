@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { TeamEntity } from 'src/modules/teams/entity/team.entity';
 
 export class UpdateUserDto {
   @ApiProperty({ example: 'Pepe' })
@@ -30,5 +31,5 @@ export class UpdateUserDto {
   rol?: RolesUser;
 
   @IsOptional()
-  equipo?: number;
+  equipo?: number | null;
 }

@@ -12,6 +12,7 @@ import { JwtPayload } from 'src/common/jwt-payload';
 import { UsersService } from '../users/users.service';
 import { StatusInvitation } from 'src/common/enums/status-invitation.enum';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { TeamsService } from '../teams/teams.service';
 
 @Injectable()
 export class InvitationsService {
@@ -20,6 +21,7 @@ export class InvitationsService {
     private readonly invitationRepository: Repository<InvitationEntity>,
 
     private readonly userService: UsersService,
+    private readonly teamService: TeamsService,
   ) {}
 
   async findById(id: number): Promise<InvitationEntity> {
@@ -84,10 +86,7 @@ export class InvitationsService {
     return invitations;
   }
 
-  async acceptInvitation(
-    userData: JwtPayload,
-    invitationId: number,
-  ): Promise<{ message: string }> {
+  async acceptInvitation(userData: JwtPayload, invitationId: number) {
     const invitation = await this.findById(invitationId);
 
     if (invitation.invitado.id !== userData.id)
@@ -95,6 +94,8 @@ export class InvitationsService {
 
     const user = await this.userService.findOne(userData.id);
     const team = invitation.equipo;
+
+    await this.teamService.incrementPlayerCount(team.id);
 
     await this.invitationRepository.update(invitation.id, {
       estado: StatusInvitation.ACCEPTED,

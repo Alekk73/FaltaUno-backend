@@ -42,6 +42,7 @@ export class TeamsService {
       nombre: dto.nombre,
       creador: { id: userData.id },
       usuarios: [{ id: userData.id }],
+      cantidad_jugadores: +1,
     });
     await this.teamRepository.save(newTeam);
 
@@ -112,10 +113,24 @@ export class TeamsService {
     await this.teamRepository.remove(team);
   }
 
+  async incrementPlayerCount(teamId: number) {
+    const team = await this.findById(teamId);
+
+    if (team.cantidad_jugadores >= 5)
+      throw new BadRequestException(
+        'No puedes unirte, limite de jugadores alcanzado',
+      );
+
+    team.cantidad_jugadores += 1;
+
+    await this.teamRepository.save(team);
+  }
+
   private responseQuery = {
     id: true,
     nombre: true,
     creadoEn: true,
+    cantidad_jugadores: true,
     usuarios: {
       id: true,
       nombre: true,
