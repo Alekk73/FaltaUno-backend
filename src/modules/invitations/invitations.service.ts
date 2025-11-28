@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -52,8 +53,7 @@ export class InvitationsService {
       },
     });
 
-    if (existInvitation)
-      throw new BadRequestException('Invitación ya existente');
+    if (existInvitation) throw new ConflictException('Invitación ya existente');
 
     const newInvitation = this.invitationRepository.create({
       creador: { id: creator.id },
