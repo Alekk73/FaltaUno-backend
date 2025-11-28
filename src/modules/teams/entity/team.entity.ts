@@ -9,6 +9,9 @@ export class TeamEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 75, nullable: false })
   nombre: string;
 
+  @Column({ type: 'int', nullable: false, default: 0 })
+  cantidad_jugadores: number;
+
   @OneToMany(() => UserEntity, (user) => user.equipo)
   usuarios: UserEntity[];
 
