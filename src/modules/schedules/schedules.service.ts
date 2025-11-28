@@ -19,14 +19,14 @@ export class SchedulesService {
 
   async findAll() {
     return await this.scheduleRepository.find({
-      relations: ['field'],
+      relations: ['match'],
     });
   }
 
   async findById(id: number) {
     const schedule = await this.scheduleRepository.findOne({
       where: { id },
-      relations: ['field'],
+      relations: ['match'],
     });
 
     if (!schedule) {
@@ -37,24 +37,25 @@ export class SchedulesService {
   }
 
   async create(dto: CreateScheduleDto) {
-    const date = new Date(dto.date_time);
-      // Verifica conflicto de horario
-    const conflict = await this.scheduleRepository.findOne({
-  where: {
-    field: { id: dto.fieldId },
-    date_time: date,
-  },
-});
+    const date = new Date(dto.hora_dia);
 
-if (conflict) {
-  throw new ConflictException(
-    'Ya existe un horario asignado a esa cancha en ese momento',
-  );
-}
+    // Verifica conflicto de horario por match + hora
+    const conflict = await this.scheduleRepository.findOne({
+      where: {
+        match: { id: dto.matchId },
+        hora_dia: date,
+      },
+    });
+
+    if (conflict) {
+      throw new ConflictException(
+        'Ya existe un horario asignado a ese partido en ese momento',
+      );
+    }
 
     const schedule = this.scheduleRepository.create({
-      date_time: date,
-      field: { id: dto.fieldId },
+      hora_dia: date,
+      match: { id: dto.matchId },
     });
 
     try {
@@ -65,28 +66,28 @@ if (conflict) {
     }
   }
 
-async update(id: number, dto: UpdateScheduleDto) {
+  async update(id: number, dto: UpdateScheduleDto) {
     const schedule = await this.findById(id);
-      //Valida conflicto de horario
-  const newDate = dto.date_time ? new Date(dto.date_time) : schedule.date_time;
-  const newFieldId = dto.fieldId ?? schedule.field.id;
 
-  const conflict = await this.scheduleRepository.findOne({
-  where: {
-    field: { id: newFieldId },
-    date_time: newDate,
-  },
-});
+    const newDate = dto.hora_dia ? new Date(dto.hora_dia) : schedule.hora_dia;
+    const newMatchId = dto.matchId ?? schedule.match.id;
 
-// Si existe otro horario con misma fecha/cancha → error
-if (conflict && conflict.id !== schedule.id) {
-  throw new ConflictException(
-    'Ya existe un horario asignado a esa cancha en ese momento',
-  );
-}
+    // Conflicto al actualizar
+    const conflict = await this.scheduleRepository.findOne({
+      where: {
+        match: { id: newMatchId },
+        hora_dia: newDate,
+      },
+    });
 
-    if (dto.date_time) schedule.date_time = new Date(dto.date_time);
-    if (dto.fieldId) schedule.field = { id: dto.fieldId } as any;
+    if (conflict && conflict.id !== schedule.id) {
+      throw new ConflictException(
+        'Ya existe un horario asignado a ese partido en ese momento',
+      );
+    }
+
+    if (dto.hora_dia) schedule.hora_dia = new Date(dto.hora_dia);
+    if (dto.matchId) schedule.match = { id: dto.matchId } as any;
 
     try {
       await this.scheduleRepository.save(schedule);
@@ -101,12 +102,10 @@ if (conflict && conflict.id !== schedule.id) {
     await this.scheduleRepository.remove(schedule);
   }
 
-  //  Metodo privado
-
   private handleSaveError(error: any) {
     if (error.code === '23505') {
       throw new ConflictException(
-        'Ya existe un horario para esa cancha y hora',
+        'Ya existe un horario para ese partido y hora',
       );
     }
     throw new BadRequestException('Error al guardar el horario');

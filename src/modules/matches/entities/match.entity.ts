@@ -10,6 +10,7 @@ import {
 import { MatchTeamEntity } from './match-team.entity';
 import { FieldEntity } from 'src/modules/fields/entity/field.entity';
 import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
+import { ScheduleEntity } from 'src/modules/schedules/entity/schedule.entity';
 
 @Entity({ name: 'partidos' })
 // Se le da un nombre al UNIQUE compuesto se cree bien y se pueda lanzar el error 23505 cuando hay duplicados
@@ -31,4 +32,8 @@ export class MatchEntity extends BaseEntity {
   @ManyToOne(() => FieldEntity, (field) => field.partidos)
   @JoinColumn({ name: 'cancha_id' })
   cancha: FieldEntity;
+
+  // Relación con el horario
+@OneToMany(() => ScheduleEntity, (schedule) => schedule.match)
+schedules: ScheduleEntity[];
 }

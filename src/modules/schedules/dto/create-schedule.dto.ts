@@ -3,9 +3,9 @@ import { IsNotEmpty, IsNumber, IsDateString } from 'class-validator';
 export class CreateScheduleDto {
   @IsNotEmpty()
   @IsDateString()
-  date_time: string;
+  hora_dia: string;
 
   @IsNotEmpty()
   @IsNumber()
-  fieldId: number;
+  matchId: number;
 }
