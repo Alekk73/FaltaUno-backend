@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -33,7 +34,7 @@ export class TeamsService {
     });
 
     if (nameInUse) {
-      throw new BadRequestException('Nombre ingresado ya en uso');
+      throw new ConflictException('Nombre ingresado ya en uso');
     }
 
     // Se crea el equipo con el usuario como creador
@@ -79,7 +80,7 @@ export class TeamsService {
     });
 
     if (newNameTeamInUse) {
-      throw new BadRequestException('Nombre ingresado ya existente');
+      throw new ConflictException('Nombre ingresado ya existente');
     }
 
     const team = await this.findById(Number(userData.equipoId));
@@ -92,14 +93,14 @@ export class TeamsService {
 
   // Elimina un equipo
   async remove(userData: JwtPayload): Promise<void> {
-    if (userData.equipoId === null) {
-      throw new BadRequestException('No existe equipo a eliminar');
-    }
-
-    const team = await this.findById(userData.equipoId);
+    const team = await this.findById(userData.equipoId as number);
 
     if (!team) {
       throw new NotFoundException('Equipo no encontrado');
+    }
+
+    if (team.creador.id !== userData.id) {
+      throw new ForbiddenException('Solo el capitán puede eliminar el equipo');
     }
 
     for (const user of team.usuarios) {
