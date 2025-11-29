@@ -20,10 +20,12 @@ import { RolesUser } from 'src/common/enums/roles-user.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
 } from '@nestjs/swagger';
 
 @Controller('invitations')
@@ -47,6 +49,7 @@ export class InvitationsController {
   // -------------------------
   //  CREATE
   // -------------------------
+  @ApiBody({ type: CreateInvitationDto })
   @ApiOperation({ summary: 'Crear invitación' })
   @ApiOkResponse({ description: 'Retorna los datos de la invitación creada' })
   @ApiBadRequestResponse({
@@ -69,6 +72,12 @@ export class InvitationsController {
   })
   @ApiOkResponse({ description: 'Invitación aceptada' })
   @ApiBadRequestResponse({ description: 'No puedes aceptar esta invitación' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único de la invitación',
+    type: Number,
+    example: 1,
+  })
   @Put('accept/:id')
   async acceptInvitation(
     @Req() req: Request,
@@ -85,6 +94,12 @@ export class InvitationsController {
     summary: 'Rechazar invitación con el identificador solicitado ',
   })
   @ApiOkResponse({ description: 'Invitación rechazada' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único de la invitación',
+    type: Number,
+    example: 1,
+  })
   @Put('reject/:id')
   async rejectInvitation(@Param('id', ParseIntPipe) id: number) {
     return await this.invitationsService.rejectInvitation(id);

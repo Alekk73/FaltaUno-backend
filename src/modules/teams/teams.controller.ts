@@ -18,11 +18,13 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
 } from '@nestjs/swagger';
 
 @Controller('teams')
@@ -32,6 +34,7 @@ export class TeamsController {
   // -------------------------
   //  CREATE
   // -------------------------
+  @ApiBody({ type: CreateTeamDto })
   @ApiOperation({ summary: 'Crear equipo' })
   @ApiOkResponse({ description: 'Retorna los datos del equipo creado' })
   @ApiBadRequestResponse({ description: 'Ya tiene un equipo' })
@@ -57,9 +60,15 @@ export class TeamsController {
   // -------------------------
   //  GET BY ID
   // -------------------------
-  @ApiOperation({ summary: 'Obtener equipo por identificador' })
+  @ApiOperation({ summary: 'Obtener equipo por ID' })
   @ApiOkResponse({ description: 'Obtener datos del equipo solicitado' })
   @ApiNotFoundResponse({ description: 'Equipo no encontrado' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del equipo',
+    type: Number,
+    example: 1,
+  })
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.teamsService.findById(+id);
@@ -68,9 +77,9 @@ export class TeamsController {
   // -------------------------
   //  UPDATE
   // -------------------------
+  @ApiBody({ type: UpdateTeamDto })
   @ApiOperation({
-    summary:
-      'Actualizar datos del equipos del usuario logeado, siempre que sea el capitan',
+    summary: 'Actualizar datos del equipos',
   })
   @ApiOkResponse({ description: 'Retorna los datos del equipo modificado' })
   @ApiConflictResponse({ description: 'Nombre ingresado ya existente' })
@@ -86,7 +95,7 @@ export class TeamsController {
   //  DELETE
   // -------------------------
   @ApiOperation({
-    summary: 'Eliminar equipo del usuario logeado, siempre que sea capitan',
+    summary: 'Eliminar equipo',
   })
   @ApiNotFoundResponse({ description: 'Equipo no encontrado' })
   @ApiForbiddenResponse({

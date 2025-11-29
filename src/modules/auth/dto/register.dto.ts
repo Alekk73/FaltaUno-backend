@@ -9,17 +9,17 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
-  @ApiProperty({ example: 'Juan' })
+  @ApiProperty({ example: 'Pepe' })
   @IsNotEmpty()
   @IsString()
   nombre: string;
 
-  @ApiProperty({ example: 'Pérez' })
+  @ApiProperty({ example: 'Argento' })
   @IsNotEmpty()
   @IsString()
   apellido: string;
 
-  @ApiProperty({ example: 'juan@mail.com' })
+  @ApiProperty({ example: 'popeargento@mail.com' })
   @IsEmail()
   correo_electronico: string;
 
