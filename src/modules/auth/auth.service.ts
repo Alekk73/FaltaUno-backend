@@ -83,6 +83,7 @@ export class AuthService {
       correo_electronico: existUser.correo_electronico,
       rol: existUser.rol,
       equipoId: existUser.equipo?.id || null,
+      visible: existUser.visible,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);

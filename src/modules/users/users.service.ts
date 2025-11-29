@@ -2,12 +2,15 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtPayload } from 'src/common/jwt-payload';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +46,7 @@ export class UsersService {
         nombre: true,
         apellido: true,
         correo_electronico: true,
+        visible: true,
         rol: true,
         equipo: {
           id: true,
@@ -56,6 +60,15 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async findAvailableUsers(): Promise<UserEntity[]> {
+    const users = await this.userRepository.find({ where: { visible: true } });
+
+    if (users.length === 0)
+      throw new NotFoundException('No existen usuarios libres');
+
+    return users;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
@@ -88,5 +101,24 @@ export class UsersService {
     await this.userRepository.delete({ id: user.id });
 
     return { message: 'Usuario eliminado correctamente' };
+  }
+
+  async changeVisibility(userData: JwtPayload) {
+    const user = await this.findOne(userData.id);
+
+    if (
+      user.rol === RolesUser.jugador ||
+      user.rol === RolesUser.capitan ||
+      user.rol === RolesUser.admin
+    )
+      throw new BadRequestException(
+        'No puedes cambiar tu visibilidad de usuario',
+      );
+
+    user.visible = !user.visible;
+
+    await this.userRepository.save(user);
+
+    return { mesagge: 'Cambio de visibilidad realizado' };
   }
 }

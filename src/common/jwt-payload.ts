@@ -5,4 +5,5 @@ export interface JwtPayload {
   correo_electronico: string;
   rol: RolesUser;
   equipoId: number | null;
+  visible: boolean;
 }
