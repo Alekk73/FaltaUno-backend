@@ -47,6 +47,8 @@ export class InvitationsService {
         'Usuario a invitar ya pertenece a un equipo',
       );
 
+    if (!guest.visible) throw new BadRequestException('Usuario no visible');
+
     const existInvitation = await this.invitationRepository.findOne({
       where: {
         invitado: { id: dto.invitadoId },
@@ -104,6 +106,7 @@ export class InvitationsService {
     await this.userService.update(user.id, {
       rol: RolesUser.jugador,
       equipo: team.id,
+      visible: false,
     });
 
     await this.rejectPendingInvitations(userData);

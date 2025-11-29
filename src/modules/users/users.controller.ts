@@ -9,6 +9,7 @@ import {
   HttpCode,
   Delete,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,6 +39,11 @@ export class UsersController {
     return await this.usersService.findByEmail(email);
   }
 
+  @Get('available')
+  async findAvailableUsers() {
+    return await this.usersService.findAvailableUsers();
+  }
+
   // -------------------------
   //  UPDATE
   // -------------------------
@@ -63,5 +69,14 @@ export class UsersController {
   async remove(@Req() req: Request) {
     const user = req.user;
     return await this.usersService.remove(user.id);
+  }
+
+  // -------------------------
+  //  CHANGE VISIBILITY
+  // -------------------------
+  @Patch('change-visibility')
+  async changeVisibility(@Req() req: Request) {
+    const user = req.user;
+    return await this.usersService.changeVisibility(user);
   }
 }

@@ -64,6 +64,7 @@ export class AuthGuard implements CanActivate {
       correo_electronico: existUser.correo_electronico,
       rol: existUser.rol,
       equipoId: existUser.equipo?.id || null,
+      visible: existUser.visible,
     };
 
     req.user = userData;

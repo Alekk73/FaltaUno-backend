@@ -32,4 +32,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   equipo?: number | null;
+
+  @IsOptional()
+  visible?: boolean;
 }

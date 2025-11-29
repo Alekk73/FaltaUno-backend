@@ -15,6 +15,7 @@ declare global {
         correo_electronico: string;
         rol: RolesUser;
         equipoId: number | null;
+        visible: boolean;
       };
     }
   }
