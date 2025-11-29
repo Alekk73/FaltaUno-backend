@@ -126,6 +126,17 @@ export class TeamsService {
     await this.teamRepository.save(team);
   }
 
+  async leaveTeam(userData: JwtPayload): Promise<{ message: string }> {
+    const team = await this.findById(userData.equipoId as number);
+
+    team.cantidad_jugadores -= 1;
+
+    await this.teamRepository.save(team);
+    await this.usersService.leaveTeam(userData.id, team.id);
+
+    return { message: 'Saliste de equipo correctamente' };
+  }
+
   private responseQuery = {
     id: true,
     nombre: true,

@@ -121,4 +121,15 @@ export class UsersService {
 
     return { mesagge: 'Cambio de visibilidad realizado' };
   }
+
+  async leaveTeam(userId: number, teamId: number): Promise<void> {
+    const user = await this.findOne(userId);
+
+    if (user.rol === RolesUser.capitan)
+      throw new BadRequestException('El capitan no puede salir del equipo');
+
+    user.equipo = null;
+    user.rol = RolesUser.usuario;
+    await this.userRepository.save(user);
+  }
 }
