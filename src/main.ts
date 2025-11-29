@@ -20,6 +20,13 @@ async function bootstrap() {
 
   // Configuracion Swagger
   SwaggerConfigModule.setupSwagger(app, configService);
+  
+  app.enableCors({
+    origin: '*',  // Cambiar cuando se se haga el deploy del frontend
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
 
   const port = +configService.get('PORT');
   await app.listen(port);
