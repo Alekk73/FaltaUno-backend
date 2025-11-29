@@ -20,11 +20,13 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
@@ -36,7 +38,7 @@ export class MatchesController {
   //  GET BY USER
   // -------------------------
   @ApiOperation({
-    summary: 'Obtener partidos del equipo al que el usuario pertenece',
+    summary: 'Obtener partidos del equipo',
   })
   @ApiOkResponse({ description: 'Retorna los partidos' })
   @ApiNotFoundResponse({
@@ -63,10 +65,16 @@ export class MatchesController {
   //  GET BY ID
   // -------------------------
   @ApiOperation({
-    summary: 'Obtener datos del partido con identidicador solicitado',
+    summary: 'Obtener datos del partido por ID',
   })
   @ApiOkResponse({ description: 'Retorna los datos del partido' })
   @ApiNotFoundResponse({ description: 'Partido no encontrado' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
+  })
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return await this.matchesService.findById(id);
@@ -75,6 +83,7 @@ export class MatchesController {
   // -------------------------
   //  CREATE
   // -------------------------
+  @ApiBody({ type: CreateMatchDto })
   @ApiOperation({
     summary: 'Crear partido',
   })
@@ -99,8 +108,10 @@ export class MatchesController {
   // -------------------------
   //  UPDATE
   // -------------------------
+  @ApiBody({ type: UpdateMatchDto })
   @ApiOperation({
     summary: 'Actualizar partido',
+    description: 'Solo el creador del partido podra actaulizar.',
   })
   @ApiOkResponse({ description: 'Retorna los datos de partido actualizado' })
   @ApiUnauthorizedResponse({
@@ -125,11 +136,21 @@ export class MatchesController {
   // -------------------------
   //  CHANGE RESULT
   // -------------------------
-  @ApiOperation({ summary: 'Cargar resultado, solo capitan local del partido' })
+  @ApiBody({ type: UpdateMatchDto })
+  @ApiOperation({
+    summary: 'Cargar resultado',
+    description: 'Solo el creador del partido podra cargar el resultado.',
+  })
   @ApiOkResponse({ description: 'Resultado actualizado' })
   @ApiBadRequestResponse({ description: 'No se puede cambiar el resultado' })
   @ApiUnauthorizedResponse({
     description: 'No puedes cambiar el resultado del partido',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
   })
   @UseGuards(RolesGuard)
   @Roles(RolesUser.capitan)
@@ -147,11 +168,18 @@ export class MatchesController {
   //  CONFIRM RESULT
   // -------------------------
   @ApiOperation({
-    summary: 'Confirmar resultado, solo capitan visitante del partido',
+    summary: 'Confirmar resultado',
+    description: 'Solo el capitan del equipo visitante puede confirmar.',
   })
   @ApiOkResponse({ description: 'Resultado confirmado' })
   @ApiUnauthorizedResponse({
     description: 'No tienes autorización para realizar la acción',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
   })
   @UseGuards(RolesGuard)
   @Roles(RolesUser.capitan)
@@ -168,12 +196,19 @@ export class MatchesController {
   //  REJECT RESULT
   // -------------------------
   @ApiOperation({
-    summary: 'Rechazar resultado, solo capitan visitante del partido',
+    summary: 'Rechazar resultado',
+    description: 'Solo el capitan del equipo visitante puede rechazar.',
   })
   @ApiOkResponse({ description: 'Resultado rechazado' })
   @ApiBadRequestResponse({ description: 'No puedes ejecutar la acción' })
   @ApiUnauthorizedResponse({
     description: 'No tienes autorización para realizar la acción',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
   })
   @Patch('result/reject/:id')
   async rejectResult(
@@ -188,8 +223,8 @@ export class MatchesController {
   //  LEAVE MATCH
   // -------------------------
   @ApiOperation({
-    summary:
-      'Salir de un partido, solo podra hacerlo el capitan del equipo visitante',
+    summary: 'Salir de un partido',
+    description: 'Solo el equipo visitante salir del partido.',
   })
   @ApiOkResponse({ description: 'Has salido del partido correctamente' })
   @ApiInternalServerErrorResponse({
@@ -215,6 +250,12 @@ export class MatchesController {
     description:
       'El partido ya tiene dos equipos o el equipo ya está participando en el partido',
   })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
+  })
   @UseGuards(RolesGuard)
   @Roles(RolesUser.capitan)
   @Patch('join/:id')
@@ -226,10 +267,19 @@ export class MatchesController {
   // -------------------------
   //  REMOVE
   // -------------------------
-  @ApiOperation({ summary: 'Eliminar partido, solo podra hacerlo el creado' })
+  @ApiOperation({
+    summary: 'Eliminar partido',
+    description: 'Solo el creador del partido puede eliminarlo.',
+  })
   @ApiOkResponse()
   @ApiUnauthorizedResponse({
     description: 'No tienes permiso para realizar esta acción',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID único del partido',
+    type: Number,
+    example: 1,
   })
   @UseGuards(RolesGuard)
   @Roles(RolesUser.capitan)
