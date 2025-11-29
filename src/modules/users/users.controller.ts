@@ -54,13 +54,11 @@ export class UsersController {
   @ApiOperation({ summary: 'Actualizar datos del usuario' })
   @ApiOkResponse({ description: 'Retorna los datos del usuario actualizado' })
   @ApiConflictResponse({ description: 'El email ingresado ya está en uso' })
-  @Put(':id')
+  @Put()
   @HttpCode(HttpStatus.OK)
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return await this.usersService.update(id, updateUserDto);
+  async update(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const user = req.user;
+    return await this.usersService.update(user.id, updateUserDto);
   }
 
   // -------------------------
