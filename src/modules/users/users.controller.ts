@@ -20,10 +20,14 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+import { TeamsService } from '../teams/teams.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly teamService: TeamsService,
+  ) {}
 
   // -------------------------
   //  GET BY EMAIL
@@ -78,5 +82,11 @@ export class UsersController {
   async changeVisibility(@Req() req: Request) {
     const user = req.user;
     return await this.usersService.changeVisibility(user);
+  }
+
+  @Patch('leave-team')
+  async leaveTeam(@Req() req: Request) {
+    const user = req.user;
+    return await this.teamService.leaveTeam(user);
   }
 }
