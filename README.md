@@ -5,41 +5,29 @@ Este servicio gestiona la lógica principal de usuarios, autenticación y equipo
 
 ---
 
-## 🚀 Tecnologías
+## Tecnologías
 
-- ⚙️ [NestJS](https://nestjs.com/) — Framework modular de Node.js  
-- 🗄️ [PostgreSQL](https://www.postgresql.org/) — Base de datos relacional  
-- 🧱 [TypeORM](https://typeorm.io/) — ORM para manejar entidades y migraciones  
-- 🔐 [JWT](https://jwt.io/) — Autenticación basada en tokens
+- [NestJS](https://nestjs.com/) — Framework modular de Node.js  
+- [PostgreSQL](https://www.postgresql.org/) — Base de datos relacional  
+- [TypeORM](https://typeorm.io/) — ORM para manejar entidades y migraciones  
+- [JWT](https://jwt.io/) — Autenticación basada en tokens
 
 ---
 
-## 📦 Estructura del proyecto
-
+Estructura del proyecto
+**URLs importante**
+- API: 
 ```
-Directory structure: 
-└── faltauno-backend/
-  ├── src/
-  │ ├── app.module.ts # Módulo raíz de la aplicación
-  │ ├── main.ts # Punto de entrada
-  │ ├── common/ # Entidades base, enums y utilidades
-  │ ├── database/ # Configuración del módulo de base de datos
-  │ ├── modules/ # Módulos principales
-  │ │ ├── auth/ # Autenticación y registro
-  │ │ ├── users/ # Gestión de usuarios
-  │ │ └── teams/ # Gestión de equipos
-  │ └── types/ # Tipos y extensiones globales
-  ├── test/ # Pruebas e2e
-  ├── .env.example # Variables de entorno de ejemplo
-  ├── package.json
-  ├── nest-cli.json
-  ├── tsconfig.json
-  └── README.md
+http://localhost:<puerto-puesto-en-archivo-env>/api 
+```
+- Documentción (Docs): 
+```
+http://localhost:<puerto-puesto-en-archivo-env>/docs
 ```
 
 ---
 
-## ⚙️ Instalación y configuración
+## Instalación y configuración
 
 1. **Clonar el repositorio**
    ```
