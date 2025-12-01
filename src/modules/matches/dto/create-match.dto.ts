@@ -14,6 +14,12 @@ class PartidoDto {
   @IsNumber()
   canchaId: number;
 
+  
+  @ApiProperty({ example: '1', required: false })
+  @IsNumber()
+  @IsOptional()
+  horarioId?: number; 
+
   @ApiProperty({ example: '1', required: false })
   @IsNumber()
   @IsOptional()
@@ -25,9 +31,9 @@ export class CreateMatchDto {
     description: 'Fecha y hora del partido',
     example: '2025-12-25T18:00:00.000Z',
   })
-  @IsNotEmpty()
+  @IsNotEmpty() 
   @IsDateString()
-  hora_dia: string;
+  hora_dia: string; 
 
   @ApiProperty({
     description: 'Detalles del partido, incluyendo el equipo y contrincante',
