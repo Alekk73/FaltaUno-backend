@@ -13,11 +13,11 @@ import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
 import { ScheduleEntity } from 'src/modules/schedules/entity/schedule.entity';
 
 @Entity({ name: 'partidos' })
-// Se le da un nombre al UNIQUE compuesto se cree bien y se pueda lanzar el error 23505 cuando hay duplicados
-@Unique('unique_match_hour_field', ['hora_dia', 'cancha'])
+
+@Unique('unique_match_hour_field', ['horario', 'cancha'])
 export class MatchEntity extends BaseEntity {
-  @Column({ type: 'timestamp', nullable: false })
-  hora_dia: Date;
+  @Column({ type: 'timestamp', nullable: true }) 
+  hora_dia: Date | null; 
 
   @Column({
     type: 'enum',
@@ -33,7 +33,12 @@ export class MatchEntity extends BaseEntity {
   @JoinColumn({ name: 'cancha_id' })
   cancha: FieldEntity;
 
-  // Relación con el horario
-  @OneToMany(() => ScheduleEntity, (schedule) => schedule.match)
-  schedules: ScheduleEntity[] | null;
+ 
+  @ManyToOne(() => ScheduleEntity, (schedule) => schedule.partidos, {
+    nullable: true, 
+  })
+  @JoinColumn({ name: 'horario_id' })
+  horario: ScheduleEntity | null;
+
+
 }

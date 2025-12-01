@@ -1,16 +1,21 @@
 import { BaseEntity } from 'src/common/base.entity';
-import { Column, Entity, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import { 
+  Column, 
+  Entity, 
+  OneToMany,  
+  Unique 
+} from 'typeorm';
 import { MatchEntity } from 'src/modules/matches/entities/match.entity';
 
 @Entity({ name: 'horarios' })
-@Unique('unique_schedule_hour_match', ['hora_dia', 'match'])
+@Unique('unique_schedule_hour', ['hora_dia']) 
 export class ScheduleEntity extends BaseEntity {
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'date', nullable: false }) 
   hora_dia: Date;
 
-  @ManyToOne(() => MatchEntity, (match) => match.schedules, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'match_id' })
-  match: MatchEntity;
+  @Column({ type: 'boolean', default: true, name: 'esta_activo' })
+  esta_activo: boolean;
+
+  @OneToMany(() => MatchEntity, (match) => match.horario)
+  partidos: MatchEntity[];
 }
