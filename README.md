@@ -7,23 +7,10 @@ Este servicio gestiona la lógica principal de usuarios, autenticación y equipo
 
 ## Tecnologías
 
-- [NestJS](https://nestjs.com/) — Framework modular de Node.js  
-- [PostgreSQL](https://www.postgresql.org/) — Base de datos relacional  
-- [TypeORM](https://typeorm.io/) — ORM para manejar entidades y migraciones  
+- [NestJS](https://nestjs.com/) — Framework modular de Node.js
+- [PostgreSQL](https://www.postgresql.org/) — Base de datos relacional
+- [TypeORM](https://typeorm.io/) — ORM para manejar entidades y migraciones
 - [JWT](https://jwt.io/) — Autenticación basada en tokens
-
----
-
-Estructura del proyecto
-**URLs importante**
-- API: 
-```
-http://localhost:<puerto-puesto-en-archivo-env>/api 
-```
-- Documentción (Docs): 
-```
-http://localhost:<puerto-puesto-en-archivo-env>/docs
-```
 
 ---
 
@@ -37,13 +24,33 @@ http://localhost:<puerto-puesto-en-archivo-env>/docs
    ```
    npm install
    ```
-4. **Configurar variables de entorno**
+3. **Configurar variables de entorno**
    - Copiar el archivo de ejemplo:
+
    ```
    cp .env.example .env
    ```
+
    - Completar las variables con tus datos (por ejemplo, nombre de la base de datos, usuario, contraseña)
-5. Iniciar el servidor en modo desarrollo
+
+4. **Iniciar el servidor en modo desarrollo**
    ```
    npm run start:dev
    ```
+
+---
+
+**URLs importante**
+
+- API:
+
+  ```
+  http://localhost:3000/api
+  ```
+
+- Documentción (Docs):
+  ```
+  http://localhost:3000/docs
+  ```
+
+En caso de cambiar el _PUERTO_ en el archivo _.env_ debe sustituir **3000** por el puerto asignado.

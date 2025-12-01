@@ -17,18 +17,22 @@ export class SwaggerConfigModule {
       .setVersion('1.0')
       .build();
 
-    const username: string = configService.get('SWAGGER_USER') as string;
-    const password: string = configService.get('SWAGGER_PASSWORD') as string;
+    const environment = configService.get('NODE_ENV');
 
-    app.use(
-      '/docs',
-      expressBasicAuth({
-        challenge: true,
-        users: {
-          [username]: password,
-        },
-      }),
-    );
+    if (environment === 'production') {
+      const username: string = configService.get('SWAGGER_USER') as string;
+      const password: string = configService.get('SWAGGER_PASSWORD') as string;
+
+      app.use(
+        '/docs',
+        expressBasicAuth({
+          challenge: true,
+          users: {
+            [username]: password,
+          },
+        }),
+      );
+    }
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('docs', app, document);
