@@ -12,7 +12,6 @@ import { FieldsModule } from './modules/fields/fields.module';
 import { SwaggerConfigModule } from './common/swagger/swagger.module';
 import { SchedulesModule } from './modules/schedules/schedules.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,7 +25,7 @@ import { SchedulesModule } from './modules/schedules/schedules.module';
     MatchesModule,
     FieldsModule,
     SwaggerConfigModule,
-     SchedulesModule,
+    SchedulesModule,
   ],
   providers: [
     {
