@@ -10,14 +10,12 @@ import {
 import { MatchTeamEntity } from './match-team.entity';
 import { FieldEntity } from 'src/modules/fields/entity/field.entity';
 import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
-import { ScheduleEntity } from 'src/modules/schedules/entity/schedule.entity';
 
 @Entity({ name: 'partidos' })
-
-@Unique('unique_match_hour_field', ['horario', 'cancha'])
+@Unique('unique_match_hour_field', ['hora_dia', 'cancha'])
 export class MatchEntity extends BaseEntity {
-  @Column({ type: 'timestamp', nullable: true }) 
-  hora_dia: Date | null; 
+  @Column({ type: 'timestamp', nullable: true })
+  hora_dia: Date | null;
 
   @Column({
     type: 'enum',
@@ -32,13 +30,4 @@ export class MatchEntity extends BaseEntity {
   @ManyToOne(() => FieldEntity, (field) => field.partidos)
   @JoinColumn({ name: 'cancha_id' })
   cancha: FieldEntity;
-
- 
-  @ManyToOne(() => ScheduleEntity, (schedule) => schedule.partidos, {
-    nullable: true, 
-  })
-  @JoinColumn({ name: 'horario_id' })
-  horario: ScheduleEntity | null;
-
-
 }

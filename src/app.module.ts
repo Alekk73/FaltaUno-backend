@@ -10,7 +10,6 @@ import { InvitationsModule } from './modules/invitations/invitations.module';
 import { MatchesModule } from './modules/matches/matches.module';
 import { FieldsModule } from './modules/fields/fields.module';
 import { SwaggerConfigModule } from './common/swagger/swagger.module';
-import { SchedulesModule } from './modules/schedules/schedules.module';
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { SchedulesModule } from './modules/schedules/schedules.module';
     MatchesModule,
     FieldsModule,
     SwaggerConfigModule,
-    SchedulesModule,
   ],
   providers: [
     {
