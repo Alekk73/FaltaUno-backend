@@ -3,4 +3,5 @@ export class CreateUserDto {
   apellido: string;
   correo_electronico: string;
   contrasena_hash: string;
+  token_activacion: string;
 }

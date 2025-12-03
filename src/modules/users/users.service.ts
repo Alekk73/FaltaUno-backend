@@ -132,4 +132,15 @@ export class UsersService {
     user.rol = RolesUser.usuario;
     await this.userRepository.save(user);
   }
+
+  async findByActivationToken(token: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { token_activacion: token } });
+  }
+
+  async activateUser(user: UserEntity) {
+    user.verificado = true;
+    user.token_activacion = null;
+
+    await this.userRepository.save(user);
+  }
 }

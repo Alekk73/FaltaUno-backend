@@ -10,12 +10,16 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { JwtService } from '@nestjs/jwt';
+import { MailProvider } from 'src/common/mail/mail.provider';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+
+    private mailProvider: MailProvider,
   ) {}
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
@@ -40,16 +44,28 @@ export class AuthService {
       Number(process.env.HASH_SALT),
     );
 
+    // Se genera token activación
+    const tokenActivation = randomBytes(32).toString('hex');
+
     const user = await this.userService.create({
       ...dto,
       contrasena_hash: hashPassword,
+      token_activacion: tokenActivation,
     });
 
     if (!user) {
       throw new BadRequestException('Error al crear el usuario');
     }
 
-    return { message: 'Usuario creado correctamente' };
+    await this.mailProvider.sendConfirmationEmail(
+      user.correo_electronico,
+      tokenActivation,
+    );
+
+    return {
+      message:
+        'Usuario creado. Revisa tu correo electronico para confirmar tu cuenta.',
+    };
   }
 
   async login(

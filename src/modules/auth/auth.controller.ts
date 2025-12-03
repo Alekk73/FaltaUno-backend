@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -20,10 +22,14 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService,
+  ) {}
 
   // -------------------------
   //  PROFILE
@@ -88,5 +94,19 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('accessToken');
     return { message: 'Sesión cerrada correctamente.' };
+  }
+
+  // -------------------------
+  //  VERIFY USER
+  // -------------------------
+  @Public()
+  @Get('verify')
+  async verify(@Query('token') token: string) {
+    const user = await this.userService.findByActivationToken(token);
+    if (!user) throw new BadRequestException('Token inválido');
+
+    await this.userService.activateUser(user);
+
+    return { message: 'Cuenta verificada exitosamente.' };
   }
 }
