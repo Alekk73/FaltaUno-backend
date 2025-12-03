@@ -26,6 +26,12 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   visible: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  verificado: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  token_activacion: string | null;
+
   @ManyToOne(() => TeamEntity, (team) => team.usuarios, {
     onDelete: 'SET NULL',
     nullable: true,

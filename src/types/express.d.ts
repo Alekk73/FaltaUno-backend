@@ -5,9 +5,9 @@ declare global {
     interface ProcessEnv {
       HASH_SALT: number;
       JWT_SECRET: string;
-      CLOUDINARY_NAME: string;
-      CLOUDINARY_API_KEY: string;
-      CLOUDINARY_API_SECRET: string;
+      SENDGRID_API_KEY: string;
+      EMAIL_SENDGRID: string;
+      FRONTEND_URL: string;
     }
   }
 }
