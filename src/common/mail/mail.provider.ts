@@ -15,7 +15,7 @@ export class MailProvider {
       to,
       from: process.env.EMAIL_SENDGRID,
       subject: 'Confirma tu cuenta',
-      html: MailConfirmationTemplate(process.env.FRONTEND_URL),
+      html: MailConfirmationTemplate(url),
     };
 
     try {
