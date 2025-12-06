@@ -47,7 +47,7 @@ export class TeamsService {
     await this.teamRepository.save(newTeam);
 
     await this.usersService.update(userData.id, {
-      rol: RolesUser.capitan,
+      rol: RolesUser.CAPTAIN,
     });
 
     // Se retorna el equipo con relaciones cargadas
@@ -106,7 +106,7 @@ export class TeamsService {
 
     for (const user of team.usuarios) {
       await this.usersService.update(user.id, {
-        rol: RolesUser.usuario,
+        rol: RolesUser.PLAYER,
       });
     }
 

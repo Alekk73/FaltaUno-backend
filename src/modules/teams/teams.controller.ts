@@ -40,7 +40,7 @@ export class TeamsController {
   @ApiBadRequestResponse({ description: 'Ya tiene un equipo' })
   @ApiConflictResponse({ description: 'Nombre ingresado ya en uso ' })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.usuario)
+  @Roles(RolesUser.PLAYER)
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateTeamDto) {
     const user = req.user;
@@ -84,7 +84,7 @@ export class TeamsController {
   @ApiOkResponse({ description: 'Retorna los datos del equipo modificado' })
   @ApiConflictResponse({ description: 'Nombre ingresado ya existente' })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Put()
   async update(@Req() req: Request, @Body() dto: UpdateTeamDto) {
     const user = req.user;
@@ -103,7 +103,7 @@ export class TeamsController {
   })
   @ApiOkResponse()
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Delete()
   async remove(@Req() req: Request) {
     const user = req.user;

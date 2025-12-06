@@ -114,9 +114,9 @@ export class UsersService {
     const user = await this.findOne(userData.id);
 
     if (
-      user.rol === RolesUser.jugador ||
-      user.rol === RolesUser.capitan ||
-      user.rol === RolesUser.admin
+      user.rol === RolesUser.PLAYER ||
+      user.rol === RolesUser.CAPTAIN ||
+      user.rol === RolesUser.ADMIN
     )
       throw new BadRequestException(
         'No puedes cambiar tu visibilidad de usuario',
@@ -132,11 +132,11 @@ export class UsersService {
   async leaveTeam(userId: number, teamId: number): Promise<void> {
     const user = await this.findOne(userId);
 
-    if (user.rol === RolesUser.capitan)
+    if (user.rol === RolesUser.CAPTAIN)
       throw new BadRequestException('El capitan no puede salir del equipo');
 
     user.equipo = null;
-    user.rol = RolesUser.usuario;
+    user.rol = RolesUser.PLAYER;
     await this.userRepository.save(user);
   }
 
