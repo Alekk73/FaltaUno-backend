@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
@@ -137,9 +138,27 @@ export class UsersService {
     return this.userRepository.findOne({ where: { token_activacion: token } });
   }
 
-  async activateUser(user: UserEntity) {
+  async findByResetPasswordToken(token: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({
+      where: { token_cambio_contrasena: token },
+    });
+  }
+
+  async activateUser(token: string) {
+    const user = await this.findByActivationToken(token);
+    if (!user) throw new UnauthorizedException('Token inválido');
+
+    const currentDate = new Date();
+    if (
+      user.token_activacion_expiracion &&
+      currentDate > user.token_activacion_expiracion
+    ) {
+      throw new BadRequestException('El token de activación ha expirado');
+    }
+
     user.verificado = true;
     user.token_activacion = null;
+    user.token_activacion_expiracion = null;
 
     await this.userRepository.save(user);
   }
