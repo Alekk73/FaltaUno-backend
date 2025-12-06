@@ -4,6 +4,7 @@ import { RolesUser } from 'src/common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
 import { TeamEntity } from 'src/modules/teams/entity/team.entity';
 import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
+import { TokenEntity } from './token.entity';
 
 @Entity({ name: 'usuarios' })
 export class UserEntity extends BaseEntity {
@@ -29,17 +30,8 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   verificado: boolean;
 
-  @Column({ type: 'varchar', nullable: true })
-  token_activacion: string | null;
-
-  @Column({ type: 'timestamp', nullable: true })
-  token_activacion_expiracion: Date | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  token_cambio_contrasena: string | null;
-
-  @Column({ type: 'timestamp', nullable: true })
-  token_cambio_contrasena_expiracion: Date | null;
+  @OneToMany(() => TokenEntity, (token) => token.usuario)
+  tokens: TokenEntity[];
 
   @ManyToOne(() => TeamEntity, (team) => team.usuarios, {
     onDelete: 'SET NULL',
