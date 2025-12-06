@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
-import { TeamEntity } from 'src/modules/teams/entity/team.entity';
 
 export class UpdateUserDto {
   @ApiProperty({ example: 'Pepe' })
@@ -35,4 +34,16 @@ export class UpdateUserDto {
 
   @IsOptional()
   visible?: boolean;
+
+  @IsOptional()
+  token_activación?: string | null;
+
+  @IsOptional()
+  token_activación_expiracion?: Date | null;
+
+  @IsOptional()
+  token_cambio_contrasena?: string | null;
+
+  @IsOptional()
+  token_cambio_contrasena_expiracion?: Date | null;
 }

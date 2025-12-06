@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -12,6 +14,8 @@ import { JwtPayload } from 'src/common/jwt-payload';
 import { JwtService } from '@nestjs/jwt';
 import { MailProvider } from 'src/common/mail/mail.provider';
 import { randomBytes } from 'crypto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { MailChangePasswordDto } from './dto/mail-change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,11 +50,15 @@ export class AuthService {
 
     // Se genera token activación
     const tokenActivation = randomBytes(32).toString('hex');
+    // Se establece la fecha de expiración
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 1);
 
     const user = await this.userService.create({
       ...dto,
       contrasena_hash: hashPassword,
       token_activacion: tokenActivation,
+      token_activacion_expiracion: expirationDate,
     });
 
     if (!user) {
@@ -85,6 +93,9 @@ export class AuthService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
+    if (!existUser.verificado)
+      throw new UnauthorizedException('Debes verificar tu cuenta');
+
     const isMatch = await bcrypt.compare(
       dto.contrasena,
       existUser.contrasena_hash,
@@ -105,6 +116,64 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken, user: existUser };
+  }
+
+  async changePassword(
+    token: string,
+    dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.userService.findByResetPasswordToken(token);
+    if (!user) throw new UnauthorizedException('Token no valido');
+
+    const now = new Date();
+    if (
+      user.token_cambio_contrasena_expiracion &&
+      user.token_cambio_contrasena_expiracion < now
+    )
+      throw new UnauthorizedException('Token expirado');
+
+    if (dto.nueva_contrasena !== dto.confirmar_nueva_contrasena)
+      throw new BadRequestException('Las contraseñas no coinciden');
+
+    const newPasswordHash = await bcrypt.hash(
+      dto.nueva_contrasena,
+      Number(process.env.HASH_SALT),
+    );
+
+    await this.userService.update(user.id, {
+      contrasena_hash: newPasswordHash,
+      token_cambio_contrasena: null,
+      token_cambio_contrasena_expiracion: null,
+    });
+
+    return { message: 'Contraseña cambiada correctamente' };
+  }
+
+  async sendMailChangePassword(
+    dto: MailChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.userService.findByEmail(dto.correo_electronico);
+    if (!user.verificado)
+      throw new UnauthorizedException('Cuenta no verificada');
+
+    await this.createTokenChangePassword(user);
+
+    return { message: 'Correo para cambiar contraseña enviado' };
+  }
+
+  async createTokenChangePassword(user: UserEntity) {
+    const token = randomBytes(32).toString('hex');
+
+    // Se establece la fecha de expiración
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 1);
+
+    await this.userService.update(user.id, {
+      token_cambio_contrasena: token,
+      token_cambio_contrasena_expiracion: expirationDate,
+    });
+
+    await this.mailProvider.MailChangePassword(user.correo_electronico, token);
   }
 
   async profile(userData: JwtPayload) {

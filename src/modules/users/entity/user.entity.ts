@@ -32,6 +32,15 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   token_activacion: string | null;
 
+  @Column({ type: 'timestamp', nullable: true })
+  token_activacion_expiracion: Date | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  token_cambio_contrasena: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  token_cambio_contrasena_expiracion: Date | null;
+
   @ManyToOne(() => TeamEntity, (team) => team.usuarios, {
     onDelete: 'SET NULL',
     nullable: true,

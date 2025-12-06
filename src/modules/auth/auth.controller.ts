@@ -1,13 +1,13 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
+  Param,
   Post,
-  Query,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -23,6 +23,8 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { UsersService } from '../users/users.service';
+import { MailChangePasswordDto } from './dto/mail-change-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -100,13 +102,27 @@ export class AuthController {
   //  VERIFY USER
   // -------------------------
   @Public()
-  @Get('verify')
-  async verify(@Query('token') token: string) {
-    const user = await this.userService.findByActivationToken(token);
-    if (!user) throw new BadRequestException('Token inválido');
-
-    await this.userService.activateUser(user);
-
+  @Get('verify-email/:token')
+  async verify(@Param('token') token: string) {
+    await this.userService.activateUser(token);
     return { message: 'Cuenta verificada exitosamente.' };
+  }
+
+  // -------------------------
+  //  SEND MAIL CHANGE PASSWORD
+  // -------------------------
+  @Public()
+  @Post('send-mail-change-password')
+  async sendMailChangePassword(@Body() dto: MailChangePasswordDto) {
+    return await this.authService.sendMailChangePassword(dto);
+  }
+
+  @Public()
+  @Post('change-password/:token')
+  async changePassword(
+    @Param('token') token: string,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return await this.authService.changePassword(token, dto);
   }
 }
