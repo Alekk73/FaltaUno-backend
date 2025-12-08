@@ -24,7 +24,7 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: false })
   contrasena_hash: string;
 
-  @Column({ type: 'enum', enum: RolesUser, default: RolesUser.PLAYER })
+  @Column({ type: 'enum', enum: RolesUser, default: RolesUser.USER })
   rol: RolesUser;
 
   @Column({ type: 'boolean', default: false })

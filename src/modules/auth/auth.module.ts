@@ -11,7 +11,7 @@ import { MailProvider } from 'src/common/mail/mail.provider';
     JwtModule.register({
       global: true,
       secret: String(process.env.JWT_SECRET),
-      signOptions: { expiresIn: '10m' },
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [AuthController],
