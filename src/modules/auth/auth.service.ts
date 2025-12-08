@@ -16,6 +16,7 @@ import { MailProvider } from 'src/common/mail/mail.provider';
 import { randomBytes } from 'crypto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { MailChangePasswordDto } from './dto/mail-change-password.dto';
+import { TypeToken } from 'src/common/enums/type-token.enum';
 
 @Injectable()
 export class AuthService {
@@ -48,26 +49,23 @@ export class AuthService {
       Number(process.env.HASH_SALT),
     );
 
-    // Se genera token activación
-    const tokenActivation = randomBytes(32).toString('hex');
-    // Se establece la fecha de expiración
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + 1);
-
     const user = await this.userService.create({
       ...dto,
       contrasena_hash: hashPassword,
-      token_activacion: tokenActivation,
-      token_activacion_expiracion: expirationDate,
     });
 
     if (!user) {
       throw new BadRequestException('Error al crear el usuario');
     }
 
+    const token = await this.userService.createToken(
+      user.id,
+      TypeToken.ACTIVATION,
+    );
+
     await this.mailProvider.sendConfirmationEmail(
       user.correo_electronico,
-      tokenActivation,
+      token,
     );
 
     return {
@@ -122,13 +120,14 @@ export class AuthService {
     token: string,
     dto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    const user = await this.userService.findByResetPasswordToken(token);
-    if (!user) throw new UnauthorizedException('Token no valido');
+    const tokenWithUser = await this.userService.findToken(token);
+    if (!tokenWithUser) throw new UnauthorizedException('Token no valido');
 
     const now = new Date();
     if (
-      user.token_cambio_contrasena_expiracion &&
-      user.token_cambio_contrasena_expiracion < now
+      tokenWithUser.expiracion &&
+      tokenWithUser.tipo === TypeToken.CHANGE_PASSWORD &&
+      tokenWithUser.expiracion < now
     )
       throw new UnauthorizedException('Token expirado');
 
@@ -140,11 +139,10 @@ export class AuthService {
       Number(process.env.HASH_SALT),
     );
 
-    await this.userService.update(user.id, {
+    await this.userService.update(tokenWithUser.usuario.id, {
       contrasena_hash: newPasswordHash,
-      token_cambio_contrasena: null,
-      token_cambio_contrasena_expiracion: null,
     });
+    await this.userService.deleteRegisterToken(tokenWithUser.id);
 
     return { message: 'Contraseña cambiada correctamente' };
   }
@@ -156,24 +154,13 @@ export class AuthService {
     if (!user.verificado)
       throw new UnauthorizedException('Cuenta no verificada');
 
-    await this.createTokenChangePassword(user);
+    const token = await this.userService.createToken(
+      user.id,
+      TypeToken.CHANGE_PASSWORD,
+    );
+    await this.mailProvider.MailChangePassword(user.correo_electronico, token);
 
     return { message: 'Correo para cambiar contraseña enviado' };
-  }
-
-  async createTokenChangePassword(user: UserEntity) {
-    const token = randomBytes(32).toString('hex');
-
-    // Se establece la fecha de expiración
-    const expirationDate = new Date();
-    expirationDate.setHours(expirationDate.getHours() + 1);
-
-    await this.userService.update(user.id, {
-      token_cambio_contrasena: token,
-      token_cambio_contrasena_expiracion: expirationDate,
-    });
-
-    await this.mailProvider.MailChangePassword(user.correo_electronico, token);
   }
 
   async profile(userData: JwtPayload) {

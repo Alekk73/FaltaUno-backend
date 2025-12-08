@@ -102,7 +102,7 @@ export class AuthController {
   //  VERIFY USER
   // -------------------------
   @Public()
-  @Get('verify-email/:token')
+  @Post('verify-email/:token')
   async verify(@Param('token') token: string) {
     await this.userService.activateUser(token);
     return { message: 'Cuenta verificada exitosamente.' };
@@ -117,6 +117,9 @@ export class AuthController {
     return await this.authService.sendMailChangePassword(dto);
   }
 
+  // -------------------------
+  //  CHANGE PASSWORD
+  // -------------------------
   @Public()
   @Post('change-password/:token')
   async changePassword(

@@ -12,12 +12,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { TokenEntity } from './entity/token.entity';
+import { TypeToken } from 'src/common/enums/type-token.enum';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+
+    @InjectRepository(TokenEntity)
+    private tokenRepository: Repository<TokenEntity>,
   ) {}
 
   async create(dto: CreateUserDto): Promise<UserEntity> {
@@ -108,9 +114,9 @@ export class UsersService {
     const user = await this.findOne(userData.id);
 
     if (
-      user.rol === RolesUser.jugador ||
-      user.rol === RolesUser.capitan ||
-      user.rol === RolesUser.admin
+      user.rol === RolesUser.PLAYER ||
+      user.rol === RolesUser.CAPTAIN ||
+      user.rol === RolesUser.ADMIN
     )
       throw new BadRequestException(
         'No puedes cambiar tu visibilidad de usuario',
@@ -126,40 +132,64 @@ export class UsersService {
   async leaveTeam(userId: number, teamId: number): Promise<void> {
     const user = await this.findOne(userId);
 
-    if (user.rol === RolesUser.capitan)
+    if (user.rol === RolesUser.CAPTAIN)
       throw new BadRequestException('El capitan no puede salir del equipo');
 
     user.equipo = null;
-    user.rol = RolesUser.usuario;
+    user.rol = RolesUser.PLAYER;
     await this.userRepository.save(user);
   }
 
-  async findByActivationToken(token: string): Promise<UserEntity | null> {
-    return this.userRepository.findOne({ where: { token_activacion: token } });
+  async createToken(userId: number, tipo: TypeToken) {
+    // Se genera token activación
+    const token = randomBytes(32).toString('hex');
+    // Se establece la fecha de expiración dependiento el tipo de token
+    const expirationDate = new Date();
+    if (tipo === TypeToken.ACTIVATION) {
+      expirationDate.setDate(expirationDate.getDate() + 1);
+    } else {
+      expirationDate.setHours(expirationDate.getHours() + 1);
+    }
+
+    const newToken = this.tokenRepository.create({
+      usuario: { id: userId },
+      tipo,
+      token,
+      expiracion: expirationDate,
+    });
+
+    await this.tokenRepository.save(newToken);
+
+    return token;
   }
 
-  async findByResetPasswordToken(token: string): Promise<UserEntity | null> {
-    return this.userRepository.findOne({
-      where: { token_cambio_contrasena: token },
+  async findToken(token: string): Promise<TokenEntity | null> {
+    return this.tokenRepository.findOne({
+      where: { token },
+      relations: ['usuario'],
     });
   }
 
   async activateUser(token: string) {
-    const user = await this.findByActivationToken(token);
-    if (!user) throw new UnauthorizedException('Token inválido');
+    const tokenWithUser = await this.findToken(token);
+    if (!tokenWithUser) throw new UnauthorizedException('Token inválido');
 
     const currentDate = new Date();
     if (
-      user.token_activacion_expiracion &&
-      currentDate > user.token_activacion_expiracion
+      tokenWithUser.expiracion &&
+      tokenWithUser.tipo === TypeToken.ACTIVATION &&
+      currentDate > tokenWithUser.expiracion
     ) {
       throw new BadRequestException('El token de activación ha expirado');
     }
 
-    user.verificado = true;
-    user.token_activacion = null;
-    user.token_activacion_expiracion = null;
+    tokenWithUser.usuario.verificado = true;
 
-    await this.userRepository.save(user);
+    await this.userRepository.save(tokenWithUser.usuario);
+    await this.deleteRegisterToken(tokenWithUser.id);
+  }
+
+  async deleteRegisterToken(registerTokenId: number) {
+    await this.tokenRepository.delete(registerTokenId);
   }
 }

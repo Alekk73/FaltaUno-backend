@@ -104,7 +104,7 @@ export class InvitationsService {
     });
 
     await this.userService.update(user.id, {
-      rol: RolesUser.jugador,
+      rol: RolesUser.PLAYER,
       equipo: team.id,
       visible: false,
     });

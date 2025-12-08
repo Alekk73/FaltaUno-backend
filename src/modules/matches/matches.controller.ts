@@ -98,7 +98,7 @@ export class MatchesController {
     description: 'Error al crear o actualizar el partido',
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateMatchDto) {
     const user = req.user;
@@ -122,7 +122,7 @@ export class MatchesController {
     description: 'Error al crear o actualizar el partido',
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Put(':id')
   async update(
     @Req() req: Request,
@@ -153,7 +153,7 @@ export class MatchesController {
     example: 1,
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Put('result/:id')
   async changeResult(
     @Req() req: Request,
@@ -182,7 +182,7 @@ export class MatchesController {
     example: 1,
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Patch('result/confirm/:id')
   async confirmResult(
     @Req() req: Request,
@@ -234,7 +234,7 @@ export class MatchesController {
     description: 'No tienes permisos para ejecutar la acción',
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Patch('leave/:id')
   async leaveMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;
@@ -257,7 +257,7 @@ export class MatchesController {
     example: 1,
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Patch('join/:id')
   async joinMatch(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;
@@ -282,7 +282,7 @@ export class MatchesController {
     example: 1,
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Delete(':id')
   async remove(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
     const user = req.user;

@@ -57,7 +57,7 @@ export class InvitationsController {
   })
   @ApiConflictResponse({ description: 'Invitación ya existente' })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.capitan)
+  @Roles(RolesUser.CAPTAIN)
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateInvitationDto) {
     const user = req.user;

@@ -20,7 +20,7 @@ export class FieldsController {
   constructor(private readonly canchasService: FieldsService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.admin)
+  @Roles(RolesUser.OWNER)
   @Post()
   create(@Body() dto: CreateFieldDto) {
     return this.canchasService.create(dto);
@@ -37,7 +37,7 @@ export class FieldsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.admin)
+  @Roles(RolesUser.OWNER)
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateFieldDto) {
     return this.canchasService.update(+id, dto);
