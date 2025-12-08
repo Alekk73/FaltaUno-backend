@@ -20,10 +20,20 @@ export class RegisterDto {
   apellido: string;
 
   @ApiProperty({ example: 'popeargento@mail.com' })
+  @IsNotEmpty()
   @IsEmail()
   correo_electronico: string;
 
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^\d{8,10}$/, {
+    message: 'El documento debe ser numérico y tener entre 8 y 10 dígitos.',
+  })
+  @Transform(({ value }) => value.trim())
+  documento: string;
+
   @ApiProperty({ example: 'A_a123456' })
+  @IsNotEmpty()
   @IsString()
   @MinLength(8, { message: 'La contraseña debe tener mínimo 8 caracteres.' })
   @Matches(/[A-Z]/, {

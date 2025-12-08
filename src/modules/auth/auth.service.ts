@@ -28,20 +28,37 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<{ message: string }> {
-    let existUser: UserEntity | null = null;
+    let existUserByEmail: UserEntity | null = null;
+    let existUserByDocument: UserEntity | null = null;
 
     try {
-      existUser = await this.userService.findByEmail(dto.correo_electronico);
+      existUserByEmail = await this.userService.findByEmail(
+        dto.correo_electronico,
+      );
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error;
       }
     }
 
-    if (existUser) {
+    try {
+      existUserByDocument = await this.userService.findByDocument(
+        dto.documento,
+      );
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+    }
+
+    if (existUserByEmail) {
       throw new BadRequestException(
         'Correo electrónico ingresado ya existente',
       );
+    }
+
+    if (existUserByDocument) {
+      throw new BadRequestException('Documento ingresado ya existente');
     }
 
     const hashPassword = await bcrypt.hash(
