@@ -44,6 +44,7 @@ export class FieldsController {
   }
 
   @Delete(':id')
+  @Roles(RolesUser.ADMIN)
   remove(@Param('id') id: string) {
     return this.canchasService.remove(+id);
   }

@@ -43,7 +43,7 @@ export class FieldsService {
 
   async remove(id: number) {
     const cancha = await this.findOne(id);
-    //falta games
+    if (!cancha) throw new NotFoundException('Cancha no encontrada');
 
     return await this.fieldRepository.remove(cancha);
   }

@@ -7,50 +7,92 @@ Este servicio gestiona la lógica principal de usuarios, autenticación y equipo
 
 ## Tecnologías
 
-- [NestJS](https://nestjs.com/) — Framework modular de Node.js
-- [PostgreSQL](https://www.postgresql.org/) — Base de datos relacional
-- [TypeORM](https://typeorm.io/) — ORM para manejar entidades y migraciones
-- [JWT](https://jwt.io/) — Autenticación basada en tokens
+- **[NestJS](https://nestjs.com/)** — Framework modular de Node.js
+- **[PostgreSQL](https://www.postgresql.org/)** — Base de datos relacional
+- **[TypeORM](https://typeorm.io/)** — ORM para manejar entidades y migraciones
+- **[JWT](https://jwt.io/)** — Autenticación basada en tokens
+- **[Docker](https://www.docker.com/)** (opcional) — Para levantar la base de datos si no se tiene PostgeSQL intalado localmente
 
 ---
 
-## Instalación y configuración
+# Instalación y configuración
 
-1. **Clonar el repositorio**
-   ```
-   git clone https://github.com/Alekk73/FaltaUno-backend.git
-   ```
-2. **Instalar dependencias**
-   ```
-   npm install
-   ```
-3. **Configurar variables de entorno**
-   - Copiar el archivo de ejemplo:
+## 1. **Clonar el repositorio**
 
-   ```
-   cp .env.example .env
-   ```
+```
+git clone https://github.com/Alekk73/FaltaUno-backend.git
+```
 
-   - Completar las variables con tus datos (por ejemplo, nombre de la base de datos, usuario, contraseña)
+Moverse al directorio en caso de ser necesario
 
-4. **Iniciar el servidor en modo desarrollo**
-   ```
-   npm run start:dev
-   ```
+```
+cd FaltaUno-backend
+```
+
+## 2. **Instalar dependencias**
+
+```
+npm install
+```
+
+## 3. **Configurar variables de entorno**
+
+- Copiar el archivo de ejemplo:
+
+```
+cp .env.example .env
+```
+
+- Completar las variables:
+  - Nombre de la base de datos
+  - Usuario y contraseña
+  - Claves JWT
+  - Config de SendGrid (si quiere registrar un usuario nuevo, sino no es necesario abra un usuario de prueba)
 
 ---
 
-**URLs importante**
+# Opción 1 - **Levantar PostgreSQL con Docker**
 
-- API:
+El proyecto incluye un `docker-compose.yml` para evitar configuración manual.
 
-  ```
-  http://localhost:3000/api
-  ```
+#### 1. Crear el contenedor para la base de datos:
 
-- Documentción (Docs):
-  ```
-  http://localhost:3000/docs
-  ```
+```
+docker compose up -d
+```
 
-En caso de cambiar el _PUERTO_ en el archivo _.env_ debe sustituir **3000** por el puerto asignado.
+Esto inicializa un contenedor PostgreSQL usando las variables del `.env`.
+
+#### 2. Crear la base de datos si no existe e inicializar el servidor backend:
+
+```
+npm run start:dev
+```
+
+---
+
+# Opción 2 - **Usar PostgreSQL local**
+
+Si ya tenés PostgreSQL instalado:
+
+```
+npm run start:dev
+```
+
+---
+
+# URLs importante
+
+### **API Base**
+
+```
+http://localhost:3000/api
+```
+
+### **Documentción (Swagger)**
+
+```
+http://localhost:3000/docs
+```
+
+> En caso de cambiar el puerto en el archivo `.env` debe sustituir `3000` por el puerto asignado.
