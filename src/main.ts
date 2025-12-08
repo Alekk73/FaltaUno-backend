@@ -2,8 +2,6 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import expressBasicAuth from 'express-basic-auth';
 import { SwaggerConfigModule } from './common/swagger/swagger.module';
 
 async function bootstrap() {
@@ -20,10 +18,10 @@ async function bootstrap() {
 
   // Configuracion Swagger
   SwaggerConfigModule.setupSwagger(app, configService);
-  
+
   app.enableCors({
-    origin: '*',  // Cambiar cuando se se haga el deploy del frontend
-    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    origin: '*', // Cambiar cuando se se haga el deploy del frontend
+    methods: 'GET,POST,PUT,PATCH,DELETE,',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
