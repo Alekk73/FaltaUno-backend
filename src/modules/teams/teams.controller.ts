@@ -40,7 +40,7 @@ export class TeamsController {
   @ApiBadRequestResponse({ description: 'Ya tiene un equipo' })
   @ApiConflictResponse({ description: 'Nombre ingresado ya en uso ' })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.PLAYER)
+  @Roles(RolesUser.USER)
   @Post()
   async create(@Req() req: Request, @Body() dto: CreateTeamDto) {
     const user = req.user;

@@ -106,7 +106,7 @@ export class TeamsService {
 
     for (const user of team.usuarios) {
       await this.usersService.update(user.id, {
-        rol: RolesUser.PLAYER,
+        rol: RolesUser.USER,
       });
     }
 

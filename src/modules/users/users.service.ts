@@ -147,7 +147,7 @@ export class UsersService {
       throw new BadRequestException('El capitan no puede salir del equipo');
 
     user.equipo = null;
-    user.rol = RolesUser.PLAYER;
+    user.rol = RolesUser.USER;
     await this.userRepository.save(user);
   }
 
