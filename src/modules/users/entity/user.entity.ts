@@ -17,6 +17,9 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 100, nullable: false, unique: true })
   correo_electronico: string;
 
+  @Column({ type: 'varchar', length: 15, nullable: false })
+  documento: string;
+
   @Exclude()
   @Column({ type: 'varchar', length: 255, nullable: false })
   contrasena_hash: string;

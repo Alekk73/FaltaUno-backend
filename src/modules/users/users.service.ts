@@ -44,6 +44,17 @@ export class UsersService {
     return user;
   }
 
+  async findByDocument(doc: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { documento: doc },
+      relations: ['equipo'],
+    });
+
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    return user;
+  }
+
   async findOne(id: number): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: { id },
