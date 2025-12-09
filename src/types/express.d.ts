@@ -1,4 +1,4 @@
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../common/enums/roles-user.enum';
 
 declare global {
   namespace NodeJS {

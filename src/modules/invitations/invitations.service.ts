@@ -10,8 +10,8 @@ import { InvitationEntity } from './entities/invitation.entity';
 import { In, Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { UsersService } from '../users/users.service';
-import { StatusInvitation } from 'src/common/enums/status-invitation.enum';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { StatusInvitation } from '../../common/enums/status-invitation.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 import { TeamsService } from '../teams/teams.service';
 
 @Injectable()

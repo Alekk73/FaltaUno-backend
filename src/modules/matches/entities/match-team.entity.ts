@@ -1,7 +1,7 @@
-import { BaseEntity } from 'src/common/base.entity';
+import { BaseEntity } from '../../../common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { MatchEntity } from './match.entity';
-import { TeamEntity } from 'src/modules/teams/entity/team.entity';
+import { TeamEntity } from '../../../modules/teams/entity/team.entity';
 
 @Entity({ name: 'partidos_equipos' })
 export class MatchTeamEntity extends BaseEntity {

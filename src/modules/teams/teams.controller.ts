@@ -15,7 +15,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import type { Request } from 'express';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 import {
   ApiBadRequestResponse,
   ApiBody,

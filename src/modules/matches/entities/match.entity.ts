@@ -1,4 +1,4 @@
-import { BaseEntity } from 'src/common/base.entity';
+import { BaseEntity } from '../../../common/base.entity';
 import {
   Column,
   Entity,
@@ -8,8 +8,8 @@ import {
   Unique,
 } from 'typeorm';
 import { MatchTeamEntity } from './match-team.entity';
-import { FieldEntity } from 'src/modules/fields/entity/field.entity';
-import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
+import { FieldEntity } from '../../../modules/fields/entity/field.entity';
+import { MatchStatusResult } from '../../../common/enums/match-status-result.enum';
 
 @Entity({ name: 'partidos' })
 @Unique('unique_match_hour_field', ['hora_dia', 'cancha'])

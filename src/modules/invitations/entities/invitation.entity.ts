@@ -1,7 +1,7 @@
-import { BaseEntity } from 'src/common/base.entity';
-import { StatusInvitation } from 'src/common/enums/status-invitation.enum';
-import { TeamEntity } from 'src/modules/teams/entity/team.entity';
-import { UserEntity } from 'src/modules/users/entity/user.entity';
+import { BaseEntity } from '../../../common/base.entity';
+import { StatusInvitation } from '../../../common/enums/status-invitation.enum';
+import { TeamEntity } from '../../../modules/teams/entity/team.entity';
+import { UserEntity } from '../../../modules/users/entity/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity({ name: 'invitaciones' })

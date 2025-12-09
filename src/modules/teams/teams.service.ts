@@ -12,7 +12,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from 'src/common/jwt-payload';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 
 @Injectable()
 export class TeamsService {
