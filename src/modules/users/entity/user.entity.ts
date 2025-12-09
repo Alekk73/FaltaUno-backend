@@ -1,9 +1,9 @@
-import { BaseEntity } from 'src/common/base.entity';
+import { BaseEntity } from '../../../common/base.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../../common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
-import { TeamEntity } from 'src/modules/teams/entity/team.entity';
-import { InvitationEntity } from 'src/modules/invitations/entities/invitation.entity';
+import { TeamEntity } from '../../../modules/teams/entity/team.entity';
+import { InvitationEntity } from '../../../modules/invitations/entities/invitation.entity';
 import { TokenEntity } from './token.entity';
 
 @Entity({ name: 'usuarios' })

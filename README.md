@@ -66,6 +66,7 @@ Esto inicializa un contenedor PostgreSQL usando las variables del `.env`.
 #### 2. Crear la base de datos si no existe e inicializar el servidor backend:
 
 ```
+npm run setup
 npm run start:dev
 ```
 
@@ -76,6 +77,7 @@ npm run start:dev
 Si ya tenés PostgreSQL instalado:
 
 ```
+npm run setup
 npm run start:dev
 ```
 
@@ -96,3 +98,17 @@ http://localhost:3000/docs
 ```
 
 > En caso de cambiar el puerto en el archivo `.env` debe sustituir `3000` por el puerto asignado.
+
+---
+
+# Usuarios generados por la seed
+
+La seed crea usuarios iniciales:
+
+`admin@example.com` — rol admin
+
+`capitan@example.com` — rol capitan (Tiene ya equipo creado)
+
+`usuario@example.com` — rol usuario
+
+Contraseña para todos: `_Pass1234`

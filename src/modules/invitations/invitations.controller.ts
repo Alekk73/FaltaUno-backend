@@ -16,7 +16,7 @@ import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import type { Request } from 'express';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import {
   ApiBadRequestResponse,

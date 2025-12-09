@@ -1,7 +1,7 @@
-import { TypeToken } from 'src/common/enums/type-token.enum';
+import { TypeToken } from '../../../common/enums/type-token.enum';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { BaseEntity } from 'src/common/base.entity';
+import { BaseEntity } from '../../../common/base.entity';
 
 @Entity({ name: 'tokens' })
 export class TokenEntity extends BaseEntity {

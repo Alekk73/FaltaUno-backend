@@ -16,7 +16,7 @@ import { MailProvider } from 'src/common/mail/mail.provider';
 import { randomBytes } from 'crypto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { MailChangePasswordDto } from './dto/mail-change-password.dto';
-import { TypeToken } from 'src/common/enums/type-token.enum';
+import { TypeToken } from '../../common/enums/type-token.enum';
 
 @Injectable()
 export class AuthService {

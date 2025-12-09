@@ -17,7 +17,7 @@ import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 import {
   ApiBadRequestResponse,
   ApiBody,

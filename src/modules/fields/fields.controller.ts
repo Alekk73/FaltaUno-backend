@@ -13,7 +13,7 @@ import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 
 @Controller('fields')
 export class FieldsController {

@@ -11,9 +11,9 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtPayload } from 'src/common/jwt-payload';
-import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { RolesUser } from '../../common/enums/roles-user.enum';
 import { TokenEntity } from './entity/token.entity';
-import { TypeToken } from 'src/common/enums/type-token.enum';
+import { TypeToken } from '../../common/enums/type-token.enum';
 import { randomBytes } from 'crypto';
 
 @Injectable()

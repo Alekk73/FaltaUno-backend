@@ -1,5 +1,5 @@
-import { BaseEntity } from 'src/common/base.entity';
-import { MatchEntity } from 'src/modules/matches/entities/match.entity';
+import { BaseEntity } from '../../../common/base.entity';
+import { MatchEntity } from '../../../modules/matches/entities/match.entity';
 import { Entity, Column, OneToMany } from 'typeorm';
 
 @Entity({ name: 'canchas' })

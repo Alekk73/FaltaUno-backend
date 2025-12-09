@@ -14,7 +14,7 @@ import { Repository } from 'typeorm';
 import { JwtPayload } from 'src/common/jwt-payload';
 import { MatchTeamEntity } from './entities/match-team.entity';
 import { TeamsService } from '../teams/teams.service';
-import { MatchStatusResult } from 'src/common/enums/match-status-result.enum';
+import { MatchStatusResult } from '../../common/enums/match-status-result.enum';
 import { FieldsService } from '../fields/fields.service';
 
 @Injectable()
