@@ -30,7 +30,7 @@ export class TeamsService {
     }
 
     const nameInUse = await this.teamRepository.findOne({
-      where: { nombre: dto.nombre },
+      where: { nombre: dto.nombre, activo: true },
     });
 
     if (nameInUse) {
@@ -47,6 +47,7 @@ export class TeamsService {
     await this.teamRepository.save(newTeam);
 
     await this.usersService.update(userData.id, {
+      visible: false,
       rol: RolesUser.CAPTAIN,
     });
 
@@ -57,6 +58,7 @@ export class TeamsService {
   // Mostrar todos los equipos
   async findAll(): Promise<TeamEntity[]> {
     return await this.teamRepository.find({
+      where: { activo: true },
       relations: ['creador', 'usuarios'],
       select: this.responseQuery,
     });
@@ -65,7 +67,7 @@ export class TeamsService {
   // Mostrar un equipo por ID
   async findById(id: number): Promise<TeamEntity> {
     const team = await this.teamRepository.findOne({
-      where: { id },
+      where: { id, activo: true },
       relations: ['creador', 'usuarios'],
       select: this.responseQuery,
     });
@@ -77,7 +79,7 @@ export class TeamsService {
   // Actualiza un equipo
   async update(userData: JwtPayload, dto: UpdateTeamDto): Promise<TeamEntity> {
     const newNameTeamInUse = await this.teamRepository.findOne({
-      where: { nombre: dto.nombre },
+      where: { nombre: dto.nombre, activo: true },
     });
 
     if (newNameTeamInUse) {
@@ -100,17 +102,21 @@ export class TeamsService {
       throw new NotFoundException('Equipo no encontrado');
     }
 
-    if (team.creador.id !== userData.id) {
+    if (team.creador!.id !== userData.id) {
       throw new ForbiddenException('Solo el capitán puede eliminar el equipo');
     }
 
     for (const user of team.usuarios) {
       await this.usersService.update(user.id, {
+        equipo: null,
         rol: RolesUser.USER,
       });
     }
 
-    await this.teamRepository.remove(team);
+    await this.teamRepository.update(team.id, {
+      creador: null,
+      activo: false,
+    });
   }
 
   async incrementPlayerCount(teamId: number) {

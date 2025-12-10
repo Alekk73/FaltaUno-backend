@@ -79,8 +79,14 @@ export class MatchesService {
     userData: JwtPayload,
     dto: CreateMatchDto,
   ): Promise<MatchEntity | void> {
+    const team = await this.teamService.findById(userData.equipoId as number);
     const date = new Date(dto.hora_dia);
     const opponentId = dto.partido.contrincante as number;
+
+    if (team.cantidad_jugadores < 5)
+      throw new BadRequestException(
+        'No tienes la cantidad de jugadores para crear partido',
+      );
 
     await this.fielService.findOne(dto.partido.canchaId);
 
@@ -169,6 +175,9 @@ export class MatchesService {
 
   async joinMatch(userData: JwtPayload, id: number) {
     const match = await this.findById(id);
+    const findNewTeam = await this.teamService.findById(
+      userData.equipoId as number,
+    );
 
     if (match.equipos.length >= 2)
       throw new BadRequestException('El partido ya tiene dos equipos');
@@ -181,6 +190,9 @@ export class MatchesService {
         'Este equipo ya está participando en el partido',
       );
     }
+
+    if (findNewTeam.cantidad_jugadores < 5)
+      throw new BadRequestException('No puedes unirte por falta de jugadores');
 
     const newTeam = this.createMatchTeam(
       userData.equipoId as number,
@@ -367,9 +379,9 @@ export class MatchesService {
               ? (matchTeam.goles_local ?? 0) // se asigna 0 si el valor de los goles es null
               : (matchTeam.goles_visitante ?? 0),
           creador: {
-            id: matchTeam.equipo?.creador.id,
-            nombre: matchTeam.equipo?.creador.nombre,
-            apellido: matchTeam.equipo?.creador.apellido,
+            id: matchTeam.equipo?.creador!.id,
+            nombre: matchTeam.equipo?.creador!.nombre,
+            apellido: matchTeam.equipo?.creador!.apellido,
           },
         },
       })),
