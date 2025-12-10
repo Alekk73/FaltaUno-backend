@@ -4,7 +4,6 @@ import {
   Put,
   Param,
   Body,
-  ParseIntPipe,
   HttpStatus,
   HttpCode,
   Delete,
@@ -21,7 +20,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiProperty,
 } from '@nestjs/swagger';
 import { TeamsService } from '../teams/teams.service';
 

@@ -50,7 +50,7 @@ export class InvitationsController {
   //  CREATE
   // -------------------------
   @ApiBody({ type: CreateInvitationDto })
-  @ApiOperation({ summary: 'Crear invitación' })
+  @ApiOperation({ summary: 'Crear invitación - CAPITAN' })
   @ApiOkResponse({ description: 'Retorna los datos de la invitación creada' })
   @ApiBadRequestResponse({
     description: 'Usuario a invitar ya pertenece a un equipo',
