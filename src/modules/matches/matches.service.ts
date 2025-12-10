@@ -155,22 +155,44 @@ export class MatchesService {
   }
 
   async leaveMatch(userData: JwtPayload, id: number) {
-    const findMatch = await this.findById(id);
-    const opponentTeam = findMatch.equipos.find((team) => !team.es_local);
-    if (!opponentTeam) {
-      throw new InternalServerErrorException(
-        'Registro de equipos visitante no encontrado',
-      );
+    try {
+      const findMatch = await this.findById(id);
+      const localTeam = findMatch.equipos.find((team) => team.es_local);
+
+      if (findMatch.equipos.length === 1)
+        throw new BadRequestException(
+          'No puedes salir del partido si no tenes rival, eliminalo.',
+        );
+
+      const matchTeam = await this.matchTeamRepository.find({
+        where: { partido: { id: findMatch.id } },
+      });
+
+      if (userData.equipoId === localTeam?.equipo?.id) {
+        const localTeamToRemove = matchTeam.find((mt) => mt.es_local);
+        const visitorTeamToLocal = matchTeam.find((mt) => !mt.es_local);
+
+        if (localTeamToRemove) {
+          await this.matchTeamRepository.remove(localTeamToRemove);
+        }
+
+        if (visitorTeamToLocal) {
+          await this.matchTeamRepository.update(visitorTeamToLocal?.id, {
+            es_local: true,
+          });
+        }
+      } else {
+        const visitorTeamToRemove = matchTeam.find((mt) => !mt.es_local);
+
+        if (visitorTeamToRemove) {
+          await this.matchTeamRepository.remove(visitorTeamToRemove);
+        }
+      }
+
+      return { message: 'Has salido del partido correctamente' };
+    } catch (error) {
+      throw new BadRequestException('Hubo un error al salir del partido');
     }
-
-    if (userData.equipoId !== opponentTeam.equipo?.id)
-      throw new UnauthorizedException(
-        'No tienes permisos para ejecutar la acción',
-      );
-
-    await this.matchTeamRepository.remove(opponentTeam);
-
-    return { message: 'Has salido del partido correctamente' };
   }
 
   async joinMatch(userData: JwtPayload, id: number) {

@@ -20,7 +20,7 @@ async function bootstrap() {
   SwaggerConfigModule.setupSwagger(app, configService);
 
   app.enableCors({
-    origin: '*', // Cambiar cuando se se haga el deploy del frontend
+    origin: configService.get<string>('FRONTEND_URL'), // Cambiar cuando se se haga el deploy del frontend
     methods: 'GET,POST,PUT,PATCH,DELETE,',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
