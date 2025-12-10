@@ -85,7 +85,7 @@ export class MatchesController {
   // -------------------------
   @ApiBody({ type: CreateMatchDto })
   @ApiOperation({
-    summary: 'Crear partido',
+    summary: 'Crear partido - CAPITAN',
   })
   @ApiOkResponse({ description: 'Retorna los datos del partido creado' })
   @ApiBadRequestResponse({
@@ -110,7 +110,7 @@ export class MatchesController {
   // -------------------------
   @ApiBody({ type: UpdateMatchDto })
   @ApiOperation({
-    summary: 'Actualizar partido',
+    summary: 'Actualizar partido - CAPITAN',
     description: 'Solo el creador del partido podra actaulizar.',
   })
   @ApiOkResponse({ description: 'Retorna los datos de partido actualizado' })
@@ -138,7 +138,7 @@ export class MatchesController {
   // -------------------------
   @ApiBody({ type: UpdateMatchDto })
   @ApiOperation({
-    summary: 'Cargar resultado',
+    summary: 'Cargar resultado - CAPITAN',
     description: 'Solo el creador del partido podra cargar el resultado.',
   })
   @ApiOkResponse({ description: 'Resultado actualizado' })
@@ -168,7 +168,7 @@ export class MatchesController {
   //  CONFIRM RESULT
   // -------------------------
   @ApiOperation({
-    summary: 'Confirmar resultado',
+    summary: 'Confirmar resultado - CAPITAN',
     description: 'Solo el capitan del equipo visitante puede confirmar.',
   })
   @ApiOkResponse({ description: 'Resultado confirmado' })
@@ -196,7 +196,7 @@ export class MatchesController {
   //  REJECT RESULT
   // -------------------------
   @ApiOperation({
-    summary: 'Rechazar resultado',
+    summary: 'Rechazar resultado - CAPITAN',
     description: 'Solo el capitan del equipo visitante puede rechazar.',
   })
   @ApiOkResponse({ description: 'Resultado rechazado' })
@@ -223,7 +223,7 @@ export class MatchesController {
   //  LEAVE MATCH
   // -------------------------
   @ApiOperation({
-    summary: 'Salir de un partido',
+    summary: 'Salir de un partido - CAPITAN',
     description: 'Solo el equipo visitante salir del partido.',
   })
   @ApiOkResponse({ description: 'Has salido del partido correctamente' })
@@ -244,7 +244,7 @@ export class MatchesController {
   // -------------------------
   //  JOIN MATCH
   // -------------------------
-  @ApiOperation({ summary: 'Unirte a un partido' })
+  @ApiOperation({ summary: 'Unirte a un partido - CAPITAN' })
   @ApiOkResponse({ description: 'Te uniste al partido correctamente' })
   @ApiBadRequestResponse({
     description:
@@ -268,7 +268,7 @@ export class MatchesController {
   //  REMOVE
   // -------------------------
   @ApiOperation({
-    summary: 'Eliminar partido',
+    summary: 'Eliminar partido - CAPITAN',
     description: 'Solo el creador del partido puede eliminarlo.',
   })
   @ApiOkResponse()

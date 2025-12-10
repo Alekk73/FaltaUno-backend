@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FieldEntity } from './entity/field.entity';
@@ -13,7 +17,15 @@ export class FieldsService {
   ) {}
 
   async create(dto: CreateFieldDto) {
+    const findCancha = await this.fieldRepository.findOne({
+      where: { nombre: dto.nombre },
+    });
+
+    if (findCancha)
+      throw new ConflictException('Nombre de cancha ingresado ya existente');
+
     const cancha = this.fieldRepository.create(dto);
+
     return await this.fieldRepository.save(cancha);
   }
 
@@ -35,6 +47,9 @@ export class FieldsService {
 
   async update(id: number, dto: UpdateFieldDto) {
     const cancha = await this.findOne(id);
+
+    if (!cancha)
+      throw new NotFoundException('Cancha a actualizar no encontrada');
 
     Object.assign(cancha, dto);
 
