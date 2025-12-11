@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { SwaggerConfigModule } from './common/swagger/swagger.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,8 +16,18 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
 
+  // Configuracion Swagger
+  SwaggerConfigModule.setupSwagger(app, configService);
+
+  app.enableCors({
+    origin: configService.get<string>('FRONTEND_URL'), // Cambiar cuando se se haga el deploy del frontend
+    methods: 'GET,POST,PUT,PATCH,DELETE,',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
+
   const port = +configService.get('PORT');
   await app.listen(port);
-  console.log(`Servidor corriendo en http://localhost${port}/api`);
+  console.log(`Servidor corriendo en http://localhost:${port}/api`);
 }
 bootstrap();
