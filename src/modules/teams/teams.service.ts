@@ -25,9 +25,14 @@ export class TeamsService {
 
   // Crear un equipo
   async create(userData: JwtPayload, dto: CreateTeamDto): Promise<TeamEntity> {
-    if (userData.equipoId !== null) {
-      throw new BadRequestException('Ya tiene un equipo.');
-    }
+    const findActive = await this.teamRepository.exists({
+      where: {
+        creador: { id: userData.id },
+        activo: true,
+      },
+    });
+
+    if (findActive) throw new BadRequestException('Ya tienes un equipo activo');
 
     const nameInUse = await this.teamRepository.findOne({
       where: { nombre: dto.nombre, activo: true },
@@ -114,7 +119,6 @@ export class TeamsService {
     }
 
     await this.teamRepository.update(team.id, {
-      creador: null,
       activo: false,
     });
   }

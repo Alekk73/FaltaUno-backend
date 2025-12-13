@@ -8,6 +8,7 @@ declare global {
       SENDGRID_API_KEY: string;
       EMAIL_SENDGRID: string;
       FRONTEND_URL: string;
+      COOKIE_SAMESITE: string;
     }
   }
 }
