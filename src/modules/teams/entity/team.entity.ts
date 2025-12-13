@@ -2,7 +2,7 @@ import { BaseEntity } from '../../../common/base.entity';
 import { InvitationEntity } from '../../../modules/invitations/entities/invitation.entity';
 import { MatchTeamEntity } from '../../../modules/matches/entities/match-team.entity';
 import { UserEntity } from '../../../modules/users/entity/user.entity';
-import { Column, Entity, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity({ name: 'equipos' })
 export class TeamEntity extends BaseEntity {
@@ -18,7 +18,7 @@ export class TeamEntity extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   activo: boolean;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'creador_id' })
   creador: UserEntity | null;
 

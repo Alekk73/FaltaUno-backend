@@ -78,8 +78,8 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+      sameSite: process.env.COOKIE_SAMESITE as 'strict' | 'none',
+      secure: process.env.COOKIE_SECURE === 'true',
       maxAge: 60 * 60 * 1000,
     });
 
@@ -96,8 +96,8 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('accessToken', {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+      sameSite: process.env.COOKIE_SAMESITE as 'lax' | 'none',
+      secure: process.env.COOKIE_SECURE === 'true',
     });
 
     return { message: 'Sesión cerrada correctamente.' };
