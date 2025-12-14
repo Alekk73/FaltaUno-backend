@@ -23,6 +23,7 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "m:run": "npm run typeorm migration:run -- -d ./src/database/data.source.ts",
     "m:gen": "npm run typeorm -- -d ./src/database/data.source.ts migration:generate ./src/database/migrations/init",
+    "m:revert": "npm run typeorm -- -d ./src/database/data.source.ts migration:revert ./src/datanase/migration/init",
     "migrate": "npm run m:run && npm run seed",
     "seed": "ts-node src/database/seed.ts"
   },

@@ -6,8 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FieldEntity } from './entity/field.entity';
-import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
+import { JwtPayload } from 'src/common/jwt-payload';
 
 @Injectable()
 export class FieldsService {
@@ -16,17 +16,24 @@ export class FieldsService {
     private readonly fieldRepository: Repository<FieldEntity>,
   ) {}
 
-  async create(dto: CreateFieldDto) {
-    const findCancha = await this.fieldRepository.findOne({
-      where: { nombre: dto.nombre },
-    });
+  async create(userData: JwtPayload) {
+    const findCancha = await this.findAll();
 
-    if (findCancha)
-      throw new ConflictException('Nombre de cancha ingresado ya existente');
+    const latestField = findCancha[findCancha.length - 1];
+    let newField: FieldEntity | null = null;
 
-    const cancha = this.fieldRepository.create(dto);
+    if (!latestField) {
+      newField = this.fieldRepository.create({
+        numero_cancha: 1,
+      });
+      await this.fieldRepository.save(newField);
+    } else {
+      newField = this.fieldRepository.create({
+        numero_cancha: latestField.numero_cancha + 1,
+      });
+    }
 
-    return await this.fieldRepository.save(cancha);
+    return await this.fieldRepository.save(newField);
   }
 
   async findAll() {

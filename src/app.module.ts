@@ -11,6 +11,7 @@ import { MatchesModule } from './modules/matches/matches.module';
 import { FieldsModule } from './modules/fields/fields.module';
 import { SwaggerConfigModule } from './common/swagger/swagger.module';
 import { MailModule } from './common/mail/mail.module';
+import { EstablishmentsModule } from './modules/establishments/establishments.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MailModule } from './common/mail/mail.module';
     FieldsModule,
     SwaggerConfigModule,
     MailModule,
+    EstablishmentsModule,
   ],
   providers: [
     {

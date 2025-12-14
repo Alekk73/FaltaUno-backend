@@ -3,4 +3,5 @@ export enum RolesUser {
   'CAPTAIN' = 'capitan',
   'PLAYER' = 'jugador',
   'USER' = 'usuario',
+  'OWNER' = 'propietario',
 }

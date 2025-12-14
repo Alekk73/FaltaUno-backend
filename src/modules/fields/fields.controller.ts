@@ -20,6 +20,8 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { type JwtPayload } from 'src/common/jwt-payload';
 
 @Controller('fields')
 export class FieldsController {
@@ -34,10 +36,10 @@ export class FieldsController {
     description: 'Nombre de cancha ingresado ya existente',
   })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.ADMIN)
+  @Roles(RolesUser.OWNER)
   @Post()
-  create(@Body() dto: CreateFieldDto) {
-    return this.canchasService.create(dto);
+  create(@CurrentUser() user: JwtPayload) {
+    return this.canchasService.create(user);
   }
 
   // -------------------------
