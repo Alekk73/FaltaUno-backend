@@ -409,7 +409,7 @@ export class MatchesService {
       })),
       cancha: {
         id: match.cancha.id,
-        nombre: match.cancha.nombre,
+        numero_cancha: match.cancha.numero_cancha,
       },
     }));
   }

@@ -1,10 +1,18 @@
 import { BaseEntity } from '../../../common/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { RolesUser } from '../../../common/enums/roles-user.enum';
 import { Exclude } from 'class-transformer';
 import { TeamEntity } from '../../../modules/teams/entity/team.entity';
 import { InvitationEntity } from '../../../modules/invitations/entities/invitation.entity';
 import { TokenEntity } from './token.entity';
+import { EstablishmentEntity } from '../../../modules/establishments/entities/establishment.entity';
 
 @Entity({ name: 'usuarios' })
 export class UserEntity extends BaseEntity {
@@ -45,4 +53,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => InvitationEntity, (inv) => inv.creador)
   invitaciones: InvitationEntity[];
+
+  @OneToOne(() => EstablishmentEntity, (e) => e.propietario)
+  establecimiento: EstablishmentEntity;
 }
