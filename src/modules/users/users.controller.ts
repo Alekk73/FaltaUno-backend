@@ -9,6 +9,8 @@ import {
   Delete,
   Req,
   Patch,
+  UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -22,6 +24,9 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { TeamsService } from '../teams/teams.service';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { RolesUser } from 'src/common/enums/roles-user.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -114,5 +119,20 @@ export class UsersController {
   async leaveTeam(@Req() req: Request) {
     const user = req.user;
     return await this.teamService.leaveTeam(user);
+  }
+
+  // -------------------------
+  //  CONVERT TO OWNER
+  // -------------------------
+  @ApiOperation({ summary: 'Convertir usuario a propietario' })
+  @ApiOkResponse({ description: 'Rol propietario asignado correctamente' })
+  @ApiNotFoundResponse({
+    description: 'Usuario no encontrado',
+  })
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.ADMIN)
+  @Patch('to-owner/:id')
+  async convertUserToOwner(@Param('id', ParseIntPipe) id: number) {
+    return await this.usersService.convertUserToOwner(id);
   }
 }

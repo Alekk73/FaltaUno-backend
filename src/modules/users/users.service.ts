@@ -151,6 +151,16 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
+  async convertUserToOwner(userId: number) {
+    const user = await this.findOne(userId);
+
+    await this.userRepository.update(user.id, {
+      rol: RolesUser.OWNER,
+    });
+
+    return { message: 'Rol propietario asignado correctamente' };
+  }
+
   async createToken(userId: number, tipo: TypeToken) {
     // Se genera token activación
     const token = randomBytes(32).toString('hex');

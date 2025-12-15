@@ -15,6 +15,12 @@ async function seed() {
     console.log('Insertando usuarios iniciales...');
 
     const hashedPass = await bcrypt.hash('_Pass1234', 10);
+    await queryRunner.query(
+      `DELETE FROM "equipos" WHERE creador_id IN (
+        SELECT id FROM "usuarios" WHERE correo_electronico IN ($1, $2, $3)
+      )`,
+      ['admin@example.com', 'capitan@example.com', 'usuario@example.com'],
+    );
 
     await queryRunner.query(
       `DELETE FROM "usuarios" WHERE correo_electronico IN ($1,$2,$3)`,
@@ -30,7 +36,8 @@ async function seed() {
         VALUES 
           ('admin', 'prueba', 'admin@example.com', '12345678', $1, 'admin', false, true, null),
           ('capitan', 'prueba', 'capitan@example.com', '87654321', $1, 'capitan', false, true, null),
-          ('usuario', 'prueba', 'usuario@example.com', '11223344', $1, 'usuario', true, true, null)
+          ('usuario', 'prueba', 'usuario@example.com', '11223344', $1, 'usuario', true, true, null),
+          ('propietario', 'prueba', 'propietario@example.com', '11223342', $1, 'propietario', false, true, null)
         RETURNING id;
       `,
       [hashedPass],
