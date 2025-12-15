@@ -8,6 +8,9 @@ export class EstablishmentEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   nombre: string;
 
+  @Column({ type: 'varchar', nullable: false, unique: true })
+  slug: string;
+
   @Column({ type: 'boolean', default: true })
   activo: boolean;
 
