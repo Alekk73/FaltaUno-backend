@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -54,6 +55,7 @@ export class FieldsService {
   async findOne(id: number) {
     const cancha = await this.fieldRepository.findOne({
       where: { id },
+      relations: ['establecimiento', 'establecimiento.propietario'],
     });
 
     if (!cancha) {
@@ -69,21 +71,34 @@ export class FieldsService {
     });
   }
 
-  async update(id: number, dto: UpdateFieldDto) {
+  async update(userId: number, id: number, dto: UpdateFieldDto) {
     const cancha = await this.findOne(id);
 
     if (!cancha)
       throw new NotFoundException('Cancha a actualizar no encontrada');
+
+    if (cancha.establecimiento.propietario.id !== userId)
+      throw new UnauthorizedException(
+        'No tienes permiso para modificar la cancha',
+      );
 
     Object.assign(cancha, dto);
 
     return await this.fieldRepository.save(cancha);
   }
 
-  async remove(id: number) {
+  async remove(userId: number, id: number) {
     const cancha = await this.findOne(id);
+
     if (!cancha) throw new NotFoundException('Cancha no encontrada');
 
-    return await this.fieldRepository.remove(cancha);
+    if (cancha.establecimiento.propietario.id !== userId)
+      throw new UnauthorizedException(
+        'No tienes permiso para eliminar la cancha',
+      );
+
+    await this.fieldRepository.remove(cancha);
+
+    return { message: 'Cancha eliminada correctamente' };
   }
 }

@@ -1,9 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { IsNumber, MinLength } from 'class-validator';
 
 export class CreateFieldDto {
-  @ApiProperty({ example: 'Cancha 1' })
-  @IsString()
-  @MinLength(3)
-  nombre: string;
+  @IsNumber()
+  numero_cancha?: number;
 }

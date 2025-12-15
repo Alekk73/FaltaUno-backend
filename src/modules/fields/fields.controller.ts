@@ -7,9 +7,9 @@ import {
   Delete,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FieldsService } from './fields.service';
-import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -30,7 +30,7 @@ export class FieldsController {
   // -------------------------
   //  CREATE
   // -------------------------
-  @ApiOperation({ summary: 'Crear cancha - ADMIN' })
+  @ApiOperation({ summary: 'Crear cancha' })
   @ApiOkResponse({ description: 'Retorna la cancha creada' })
   @ApiConflictResponse({
     description: 'Nombre de cancha ingresado ya existente',
@@ -66,25 +66,33 @@ export class FieldsController {
   // -------------------------
   //  UPDATE
   // -------------------------
-  @ApiOperation({ summary: 'Actualizar cancha por ID - ADMIN' })
+  @ApiOperation({ summary: 'Actualizar cancha por ID' })
   @ApiOkResponse({ description: 'Retorna los datos de la cancha actualizada' })
   @ApiNotFoundResponse({ description: 'Cancha no encontrada' })
   @UseGuards(RolesGuard)
-  @Roles(RolesUser.ADMIN)
+  @Roles(RolesUser.OWNER)
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateFieldDto) {
-    return this.canchasService.update(+id, dto);
+  update(
+    @CurrentUser() user: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateFieldDto,
+  ) {
+    return this.canchasService.update(user.id, id, dto);
   }
 
   // -------------------------
   //  REMOVE
   // -------------------------
-  @ApiOperation({ summary: 'Eliminar cancha por ID - ADMIN' })
+  @ApiOperation({ summary: 'Eliminar cancha por ID' })
   @ApiOkResponse()
   @ApiNotFoundResponse({ description: 'Cancha no encontrada' })
+  @UseGuards(RolesGuard)
+  @Roles(RolesUser.OWNER)
   @Delete(':id')
-  @Roles(RolesUser.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.canchasService.remove(+id);
+  remove(
+    @CurrentUser() user: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.canchasService.remove(user.id, id);
   }
 }
