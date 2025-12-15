@@ -154,6 +154,9 @@ export class UsersService {
   async convertUserToOwner(userId: number) {
     const user = await this.findOne(userId);
 
+    if (!user.verificado === false)
+      throw new BadRequestException('Usuario no verificado');
+
     await this.userRepository.update(user.id, {
       rol: RolesUser.OWNER,
     });
