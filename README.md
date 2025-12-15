@@ -111,4 +111,6 @@ La seed crea usuarios iniciales:
 
 `usuario@example.com` — rol usuario
 
+`propietario@example.com` — rol propietario (podra crear un establecimiento con canchas, dirección y valor de las mismas)
+
 Contraseña para todos: `_Pass1234`

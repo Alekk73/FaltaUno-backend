@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { EstablishmentsService } from './establishments.service';
